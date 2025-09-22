@@ -6,6 +6,11 @@ use tokio::io::AsyncReadExt;
 use super::args::Args;
 
 #[derive(Deserialize)]
+pub struct DatabaseConfig {
+    pub url: String,
+}
+
+#[derive(Deserialize)]
 pub struct ServerConfig {
     pub bind: String,
     pub port: u16,
@@ -13,6 +18,7 @@ pub struct ServerConfig {
 
 #[derive(Deserialize)]
 pub struct ApplicationConfig {
+    pub database: DatabaseConfig,
     pub server: ServerConfig,
 }
 
