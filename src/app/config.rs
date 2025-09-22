@@ -5,18 +5,18 @@ use tokio::io::AsyncReadExt;
 
 use super::args::Args;
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct DatabaseConfig {
     pub url: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct ServerConfig {
     pub bind: String,
     pub port: u16,
 }
 
-#[derive(Deserialize)]
+#[derive(Clone, Deserialize)]
 pub struct ApplicationConfig {
     pub database: DatabaseConfig,
     pub server: ServerConfig,
