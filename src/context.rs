@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::app::config::ApplicationConfig;
+use crate::config::ApplicationConfig;
 
 #[derive(Clone)]
 pub struct ApplicationContext {

@@ -1,10 +1,12 @@
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 
-mod app;
-use self::app::args;
-use self::app::config::ApplicationConfig;
-use self::app::context::ApplicationContext;
+mod args;
+mod config;
+mod context;
+
+use self::config::ApplicationConfig;
+use self::context::ApplicationContext;
 
 #[actix_rt::main]
 async fn main() -> anyhow::Result<()> {
