@@ -2,11 +2,12 @@ use actix_web::{App, HttpServer};
 
 mod app;
 use self::app::args;
+use self::app::config::ApplicationConfig;
 
 #[actix_rt::main]
 async fn main() -> anyhow::Result<()> {
     let args = args::parse();
-    let config = app::config::load(&args.config_file).await?;
+    let config = ApplicationConfig::load(&args).await?;
 
     let server = HttpServer::new(move || {
         App::new()
