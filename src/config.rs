@@ -3,7 +3,7 @@ use serde::Deserialize;
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 
-use super::args::Args;
+use crate::args::Args;
 
 #[derive(Clone, Deserialize)]
 pub struct DatabaseConfig {
