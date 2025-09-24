@@ -7,6 +7,7 @@ mod args;
 mod config;
 mod context;
 mod handlers;
+mod models;
 
 use self::config::ApplicationConfig;
 use self::context::ApplicationContext;
