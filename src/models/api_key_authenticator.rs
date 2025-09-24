@@ -14,7 +14,7 @@ impl ApiKeyAuthenticator {
         }
     }
 
-    pub async fn authenticate(&self, context: &ApplicationContext) -> Result<User> {
-        Ok(User::new(1))
+    pub async fn authenticate(&self, context: &ApplicationContext) -> Result<Option<User>> {
+        Ok(Some(User::new(1)))
     }
 }
