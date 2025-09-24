@@ -7,10 +7,12 @@ mod args;
 mod config;
 mod context;
 mod handlers;
+mod middlewares;
 mod models;
 
 use self::config::ApplicationConfig;
 use self::context::ApplicationContext;
+use self::middlewares::require_api_key::RequireApiKey;
 
 #[actix_rt::main]
 async fn main() -> anyhow::Result<()> {
@@ -25,7 +27,9 @@ async fn main() -> anyhow::Result<()> {
             .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
             .app_data(Data::new(context.clone()))
             .service(
-                scope("/api").configure(handlers::api::routes)
+                scope("/api")
+                    .wrap(RequireApiKey::new())
+                    .configure(handlers::api::routes)
             )
     });
     server.bind((config.server.bind, config.server.port))?.run().await?;
