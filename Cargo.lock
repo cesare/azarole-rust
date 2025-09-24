@@ -381,6 +381,7 @@ dependencies = [
  "anyhow",
  "clap",
  "env_logger",
+ "hmac",
  "serde",
  "serde_derive",
  "serde_json",
