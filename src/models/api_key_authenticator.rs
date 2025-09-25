@@ -36,7 +36,7 @@ impl ApiKeyAuthenticator {
     fn digest_token(&self) -> Result<String> {
         let secret_key: String = std::env::var("API_KEY_DIGESTING_SECRET_KEY").unwrap();
         let mut mac = Hmac::<Sha256>::new_from_slice(secret_key.as_bytes())?;
-        mac.update(&self.token.as_bytes());
+        mac.update(self.token.as_bytes());
         let result = mac.finalize();
         let bytes = result.into_bytes();
         let digest = hex::encode(bytes);
