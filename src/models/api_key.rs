@@ -1,5 +1,9 @@
+use sqlx::prelude::FromRow;
+
+#[derive(FromRow)]
 pub struct ApiKey {
-    id: u32,
-    name: String,
-    digest: String,
+    pub id: u32,
+    pub user_id: u32,
+    pub name: String,
+    pub digest: String,
 }
