@@ -1,6 +1,6 @@
 #[derive(Clone)]
 pub struct User {
-    id: u32,
+    pub id: u32,
 }
 
 impl User {
