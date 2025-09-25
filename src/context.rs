@@ -16,6 +16,7 @@ impl DatabaseContext {
 }
 
 #[derive(Clone)]
+#[allow(dead_code)]
 pub struct ApplicationContext {
     pub config: ApplicationConfig,
     pub database: DatabaseContext,
