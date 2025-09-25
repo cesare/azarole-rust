@@ -1,9 +1,10 @@
 use std::rc::Rc;
 
-use actix_web::{Error, HttpMessage};
+use actix_web::{Error, FromRequest, HttpMessage};
 use actix_web::body::MessageBody;
 use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::web::Data;
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 use futures_util::future::{ok, LocalBoxFuture, Ready};
 
 use crate::context::ApplicationContext;
@@ -58,7 +59,11 @@ where
 
         Box::pin(async move {
             let context: &Data<ApplicationContext> = req.app_data().unwrap();
-            let authenticator = ApiKeyAuthenticator::new("dummy-token");
+
+            let bearer_auth = BearerAuth::extract(req.request()).await?;
+            let token = bearer_auth.token();
+
+            let authenticator = ApiKeyAuthenticator::new(token);
             let result = authenticator.authenticate(context.get_ref()).await;
             match result {
                 Ok(Some(user)) => {
