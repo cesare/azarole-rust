@@ -1,4 +1,6 @@
+use std::ops::Deref;
 use std::rc::Rc;
+use std::sync::Arc;
 
 use actix_web::{Error, FromRequest, HttpMessage};
 use actix_web::body::MessageBody;
@@ -63,8 +65,8 @@ where
             let bearer_auth = BearerAuth::extract(req.request()).await?;
             let token = bearer_auth.token();
 
-            let authenticator = ApiKeyAuthenticator::new(token);
-            let result = authenticator.authenticate(context.get_ref()).await;
+            let authenticator = ApiKeyAuthenticator::new(Arc::clone(context.deref()), token);
+            let result = authenticator.authenticate().await;
             match result {
                 Ok(Some(user)) => {
                     req.extensions_mut().insert(user);

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use anyhow::Result;
 use sha2::Sha256;
 use hmac::{Hmac, Mac};
@@ -7,19 +9,21 @@ use crate::models::user::User;
 use crate::models::api_key::ApiKey;
 
 pub struct ApiKeyAuthenticator {
+    context: Arc<ApplicationContext>,
     token: String,
 }
 
 impl ApiKeyAuthenticator {
-    pub fn new(token: &str) -> Self {
+    pub fn new(context: Arc<ApplicationContext>, token: &str) -> Self {
         Self {
+            context,
             token: token.to_owned(),
         }
     }
 
-    pub async fn authenticate(&self, context: &ApplicationContext) -> Result<Option<User>> {
+    pub async fn authenticate(&self) -> Result<Option<User>> {
         let digest = self.digest_token()?;
-        match self.find_api_token(&digest, context).await? {
+        match self.find_api_token(&digest).await? {
             Some(api_key) => {
                 Ok(Some(User::new(api_key.user_id)))
             },
@@ -39,10 +43,10 @@ impl ApiKeyAuthenticator {
         Ok(digest)
     }
 
-    async fn find_api_token(&self, digest: &str, context: &ApplicationContext) -> Result<Option<ApiKey>> {
+    async fn find_api_token(&self, digest: &str) -> Result<Option<ApiKey>> {
         let result: Option<ApiKey> = sqlx::query_as("select id, user_id, name, digest from api_keys where digest = $1")
             .bind(digest)
-            .fetch_optional(&context.database.pool)
+            .fetch_optional(&self.context.database.pool)
             .await?;
         Ok(result)
     }
