@@ -8,20 +8,20 @@ use crate::context::ApplicationContext;
 use crate::models::user::User;
 use crate::models::api_key::ApiKey;
 
-pub struct ApiKeyAuthenticator {
+pub(super) struct ApiKeyAuthenticator {
     context: Arc<ApplicationContext>,
     token: String,
 }
 
 impl ApiKeyAuthenticator {
-    pub fn new(context: Arc<ApplicationContext>, token: &str) -> Self {
+    pub(super) fn new(context: Arc<ApplicationContext>, token: &str) -> Self {
         Self {
             context,
             token: token.to_owned(),
         }
     }
 
-    pub async fn authenticate(&self) -> Result<Option<User>> {
+    pub(super) async fn authenticate(&self) -> Result<Option<User>> {
         let digest = self.digest_token()?;
         match self.find_api_token(&digest).await? {
             Some(api_key) => {

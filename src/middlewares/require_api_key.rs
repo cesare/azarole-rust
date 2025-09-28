@@ -9,8 +9,10 @@ use actix_web::web::Data;
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use futures_util::future::{ok, LocalBoxFuture, Ready};
 
+mod api_key_authenticator;
+
 use crate::context::ApplicationContext;
-use crate::models::api_key_authenticator::ApiKeyAuthenticator;
+use api_key_authenticator::ApiKeyAuthenticator;
 
 pub struct RequireApiKey;
 
