@@ -7,7 +7,7 @@ use serde_json::json;
 
 use crate::context::ApplicationContext;
 use crate::errors::{DatabaseError, PerRequestError};
-use crate::models::attendance_record::AttendanceRecord;
+use crate::models::attendance_record::{AttendanceRecord, Event};
 use crate::models::user::User;
 
 pub fn routes(config: &mut ServiceConfig) {
@@ -21,7 +21,12 @@ async fn clock_in(context: Data<ApplicationContext>, current_user: ReqData<User>
 
     let attendance_record = create_clock_in(context.get_ref(), workplace_id).await?;
     let response_json = json!({
-        "attendanceRecord": attendance_record,
+        "attendanceRecord": {
+            "id": attendance_record.id,
+            "workplaceId": attendance_record.workplace_id,
+            "event": attendance_record.event,
+            "recordedAt": attendance_record.recorded_at,
+        },
     });
     let response = HttpResponse::Created().json(response_json);
     Ok(response)
@@ -44,7 +49,7 @@ async fn create_clock_in(context: &ApplicationContext, workplace_id: u32) -> Res
     let statement = "insert into attendance_records (workplace_id, event, recorded_at, created_at) values($1, $2, $3, $4) returning id, workplace_id, event, recorded_at";
     let result = sqlx::query_as::<sqlx::Sqlite, AttendanceRecord>(statement)
         .bind(workplace_id)
-        .bind("clock-in")
+        .bind(Event::ClockIn)
         .bind(now)
         .bind(now)
         .fetch_one(&context.database.pool)
