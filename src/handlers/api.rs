@@ -17,7 +17,7 @@ pub fn routes(config: &mut ServiceConfig) {
 
 async fn clock_in(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<u32>) -> Result<HttpResponse, PerRequestError> {
     let workplace_id = path.into_inner();
-    let _ = ensure_workplace(context.get_ref(), current_user.deref(), workplace_id).await?;
+    ensure_workplace(context.get_ref(), current_user.deref(), workplace_id).await?;
 
     let attendance_record = create_clock_in(context.get_ref(), workplace_id).await?;
     let response_json = json!({
