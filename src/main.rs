@@ -6,6 +6,7 @@ use env_logger::Env;
 mod args;
 mod config;
 mod context;
+mod errors;
 mod handlers;
 mod middlewares;
 mod models;
