@@ -410,6 +410,7 @@ dependencies = [
  "futures-util",
  "hex",
  "hmac",
+ "log",
  "serde",
  "serde_derive",
  "serde_json",
