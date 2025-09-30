@@ -6,8 +6,9 @@ use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
     models::{
-        attendance_record::{AttendanceRecord, Event},
-        user::User
+        AttendanceRecord,
+        attendance_record::Event,
+        User
     }
 };
 

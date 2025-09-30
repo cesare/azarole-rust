@@ -5,8 +5,8 @@ use sha2::Sha256;
 use hmac::{Hmac, Mac};
 
 use crate::context::ApplicationContext;
-use crate::models::user::User;
-use crate::models::api_key::ApiKey;
+use crate::models::User;
+use crate::models::ApiKey;
 
 pub(super) struct ApiKeyAuthenticator {
     context: Arc<ApplicationContext>,

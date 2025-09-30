@@ -7,8 +7,8 @@ use serde_json::json;
 use crate::context::ApplicationContext;
 use crate::errors::PerRequestError;
 use crate::models::attendance_record::Event;
-use crate::models::attendance_registration::AttendanceRegistration;
-use crate::models::user::User;
+use crate::models::AttendanceRegistration;
+use crate::models::User;
 
 pub fn routes(config: &mut ServiceConfig) {
     config
