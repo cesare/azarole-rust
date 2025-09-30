@@ -8,7 +8,8 @@ use crate::{
     models::{
         AttendanceRecord,
         attendance_record::Event,
-        User
+        User,
+        WorkplaceId,
     }
 };
 
@@ -21,12 +22,12 @@ impl AttendanceRegistration {
         Self { context }
     }
 
-    pub async fn execute(&self, user: &User, workplace_id: u32, event: Event) -> Result<AttendanceRecord, DatabaseError> {
+    pub async fn execute(&self, user: &User, workplace_id: WorkplaceId, event: Event) -> Result<AttendanceRecord, DatabaseError> {
         self.ensure_workplace(user, workplace_id).await?;
         self.create_attendance(workplace_id, event).await
     }
 
-    async fn ensure_workplace(&self, user: &User, workplace_id: u32) -> Result<(), DatabaseError> {
+    async fn ensure_workplace(&self, user: &User, workplace_id: WorkplaceId) -> Result<(), DatabaseError> {
         let result = sqlx::query_as::<sqlx::Sqlite, (u32,)>("select 1 from workplaces where user_id = $1 and id = $2")
             .bind(user.id)
             .bind(workplace_id)
@@ -38,7 +39,7 @@ impl AttendanceRegistration {
         }
     }
 
-    async fn create_attendance(&self, workplace_id: u32, event: Event) -> Result<AttendanceRecord, DatabaseError> {
+    async fn create_attendance(&self, workplace_id: WorkplaceId, event: Event) -> Result<AttendanceRecord, DatabaseError> {
         let now = Utc::now();
         let statement = "insert into attendance_records (workplace_id, event, recorded_at, created_at) values($1, $2, $3, $4) returning id, workplace_id, event, recorded_at";
         let result = sqlx::query_as::<sqlx::Sqlite, AttendanceRecord>(statement)

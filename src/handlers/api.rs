@@ -7,7 +7,7 @@ use serde_json::json;
 use crate::context::ApplicationContext;
 use crate::errors::PerRequestError;
 use crate::models::attendance_record::Event;
-use crate::models::AttendanceRegistration;
+use crate::models::{AttendanceRegistration, WorkplaceId};
 use crate::models::User;
 
 pub fn routes(config: &mut ServiceConfig) {
@@ -16,15 +16,15 @@ pub fn routes(config: &mut ServiceConfig) {
         .route("/workplaces/{workplace_id}/clock_outs", post().to(clock_out));
 }
 
-async fn clock_in(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<u32>) -> Result<HttpResponse, PerRequestError> {
+async fn clock_in(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<WorkplaceId>) -> Result<HttpResponse, PerRequestError> {
     create_clock(context, current_user, path, Event::ClockIn).await
 }
 
-async fn clock_out(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<u32>) -> Result<HttpResponse, PerRequestError> {
+async fn clock_out(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<WorkplaceId>) -> Result<HttpResponse, PerRequestError> {
     create_clock(context, current_user, path, Event::ClockOut).await
 }
 
-async fn create_clock(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<u32>, event: Event) -> Result<HttpResponse, PerRequestError> {
+async fn create_clock(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<WorkplaceId>, event: Event) -> Result<HttpResponse, PerRequestError> {
     let workplace_id = path.into_inner();
 
     let registration = AttendanceRegistration::new(Arc::clone(&context.into_inner()));
