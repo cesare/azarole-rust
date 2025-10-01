@@ -11,6 +11,11 @@ pub struct DatabaseConfig {
 }
 
 #[derive(Clone, Deserialize)]
+pub struct FrontendConfig {
+    pub base_url: String,
+}
+
+#[derive(Clone, Deserialize)]
 pub struct ServerConfig {
     pub bind: String,
     pub port: u16,
@@ -19,6 +24,7 @@ pub struct ServerConfig {
 #[derive(Clone, Deserialize)]
 pub struct ApplicationConfig {
     pub database: DatabaseConfig,
+    pub frontend: FrontendConfig,
     pub server: ServerConfig,
 }
 
