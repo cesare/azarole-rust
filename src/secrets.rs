@@ -28,9 +28,21 @@ impl GoogleAuthConfig {
     }
 }
 
+pub struct SessionConfig;
+
+impl SessionConfig {
+    pub fn default() -> Self {
+        Self {}
+    }
+    pub fn session_key(&self) -> String {
+        env::var("SESSION_KEY").unwrap()
+    }
+}
+
 pub struct Secrets {
     pub api_key: ApikeyConfig,
     pub google_auth: GoogleAuthConfig,
+    pub session: SessionConfig,
 }
 
 impl Secrets {
@@ -38,6 +50,7 @@ impl Secrets {
         Self {
             api_key: ApikeyConfig::default(),
             google_auth: GoogleAuthConfig::default(),
+            session: SessionConfig::default(),
         }
     }
 }
