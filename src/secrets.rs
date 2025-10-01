@@ -1,4 +1,5 @@
 use std::env;
+use base64::{engine::general_purpose::STANDARD, Engine as _};
 
 #[derive(Default)]
 pub struct ApikeyConfig;
@@ -26,8 +27,9 @@ impl GoogleAuthConfig {
 pub struct SessionConfig;
 
 impl SessionConfig {
-    pub fn session_key(&self) -> String {
-        env::var("SESSION_KEY").unwrap()
+    pub fn session_key(&self) -> Vec<u8> {
+        let base64_value = env::var("SESSION_KEY").unwrap();
+        STANDARD.decode(base64_value).unwrap()
     }
 }
 

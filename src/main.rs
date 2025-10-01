@@ -1,4 +1,6 @@
 use actix_cors::Cors;
+use actix_session::{SessionMiddleware, storage::CookieSessionStore};
+use actix_web::cookie::Key;
 use actix_web::http::header;
 use actix_web::middleware::Logger;
 use actix_web::web::{scope, Data};
@@ -17,6 +19,7 @@ mod secrets;
 use self::config::ApplicationConfig;
 use self::context::ApplicationContext;
 use self::middlewares::require_api_key::RequireApiKey;
+use self::secrets::Secrets;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
     Cors::default()
@@ -24,6 +27,11 @@ fn build_cors(config: &ApplicationConfig) -> Cors {
         .allowed_methods(vec!["POST", "GET", "DELETE", "OPTIONS"])
         .allowed_headers(vec![header::CONTENT_TYPE])
         .supports_credentials()
+}
+
+fn build_session_middleware() -> SessionMiddleware<CookieSessionStore> {
+    let session_key = Secrets::default().session.session_key();
+    SessionMiddleware::new(CookieSessionStore::default(), Key::from(&session_key))
 }
 
 #[actix_rt::main]
@@ -39,6 +47,7 @@ async fn main() -> anyhow::Result<()> {
         App::new()
             .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
             .wrap(build_cors(&config))
+            .wrap(build_session_middleware())
             .app_data(Data::new(context.clone()))
             .service(
                 scope("/api")
