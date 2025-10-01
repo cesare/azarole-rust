@@ -7,6 +7,7 @@ use hmac::{Hmac, Mac};
 use crate::context::ApplicationContext;
 use crate::models::User;
 use crate::models::ApiKey;
+use crate::secrets::Secrets;
 
 pub(super) struct ApiKeyAuthenticator {
     context: Arc<ApplicationContext>,
@@ -34,7 +35,8 @@ impl ApiKeyAuthenticator {
     }
 
     fn digest_token(&self) -> Result<String> {
-        let secret_key: String = std::env::var("API_KEY_DIGESTING_SECRET_KEY").unwrap();
+        let secrets = Secrets::default();
+        let secret_key = secrets.api_key.digesting_secret_key();
         let mut mac = Hmac::<Sha256>::new_from_slice(secret_key.as_bytes())?;
         mac.update(self.token.as_bytes());
         let result = mac.finalize();

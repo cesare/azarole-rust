@@ -12,6 +12,7 @@ mod errors;
 mod handlers;
 mod middlewares;
 mod models;
+mod secrets;
 
 use self::config::ApplicationConfig;
 use self::context::ApplicationContext;
