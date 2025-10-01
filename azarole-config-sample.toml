@@ -2,6 +2,9 @@
 bind = "127.0.0.1"
 port = 3000
 
+[app]
+base_url = "http://localhost:3000"
+
 [database]
 url = "sqlite3:azarole-dev.sqlite3"
 

@@ -6,6 +6,11 @@ use tokio::io::AsyncReadExt;
 use crate::args::Args;
 
 #[derive(Clone, Deserialize)]
+pub struct AppConfig {
+    pub base_url: String,
+}
+
+#[derive(Clone, Deserialize)]
 pub struct DatabaseConfig {
     pub url: String,
 }
@@ -23,6 +28,7 @@ pub struct ServerConfig {
 
 #[derive(Clone, Deserialize)]
 pub struct ApplicationConfig {
+    pub app: AppConfig,
     pub database: DatabaseConfig,
     pub frontend: FrontendConfig,
     pub server: ServerConfig,
