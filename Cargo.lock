@@ -412,6 +412,7 @@ dependencies = [
  "hex",
  "hmac",
  "log",
+ "rand 0.9.2",
  "serde",
  "serde_derive",
  "serde_json",
