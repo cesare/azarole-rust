@@ -54,6 +54,9 @@ async fn main() -> anyhow::Result<()> {
                     .wrap(RequireApiKey::new())
                     .configure(handlers::api::routes)
             )
+            .service(
+                scope("/auth/google").configure(handlers::auth::routes)
+            )
     });
     server.bind((server_config.bind, server_config.port))?.run().await?;
     Ok(())
