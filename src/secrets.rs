@@ -12,14 +12,32 @@ impl ApikeyConfig {
     }
 }
 
+pub struct GoogleAuthConfig;
+
+impl GoogleAuthConfig {
+    pub fn default() -> Self {
+        Self {}
+    }
+
+    pub fn client_id(&self) -> String {
+        env::var("GOOGLE_AUTH_CLIENT_ID").unwrap()
+    }
+
+    pub fn client_secret(&self) -> String {
+        env::var("GOOGLE_AUTH_CLIENT_SECRET").unwrap()
+    }
+}
+
 pub struct Secrets {
     pub api_key: ApikeyConfig,
+    pub google_auth: GoogleAuthConfig,
 }
 
 impl Secrets {
     pub fn default() -> Self {
         Self {
             api_key: ApikeyConfig::default(),
+            google_auth: GoogleAuthConfig::default(),
         }
     }
 }
