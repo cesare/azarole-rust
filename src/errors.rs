@@ -1,3 +1,4 @@
+use actix_session::{SessionGetError, SessionInsertError};
 use actix_web::{http::StatusCode, HttpResponse, ResponseError};
 use serde_json::json;
 use sqlx::error::Error as SqlxError;
@@ -58,5 +59,17 @@ impl From<DatabaseError> for PerRequestError {
             DatabaseError::RecordNotFound => Self::NotFound,
             _ => Self::ServerError,
         }
+    }
+}
+
+impl From<SessionGetError> for PerRequestError {
+    fn from(_value: SessionGetError) -> Self {
+        Self::ServerError
+    }
+}
+
+impl From<SessionInsertError> for PerRequestError {
+    fn from(_value: SessionInsertError) -> Self {
+        Self::ServerError
     }
 }
