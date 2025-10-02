@@ -41,7 +41,7 @@ impl<'a> AuthenticationRequestGenerator<'a> {
             ("client_id", client_id),
             ("redirect_uri", redirect_uri),
             ("response_type", "code".to_owned()),
-            ("scope", "openid".to_owned()),
+            ("scope", "openid email".to_owned()),
             ("state", state.to_owned()),
         ]).unwrap();
         url.into()
