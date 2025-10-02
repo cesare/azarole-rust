@@ -13,6 +13,7 @@ use crate::{
 
 pub(super) struct AuthenticationRequest {
     pub(super) state: String,
+    pub(super) nonce: String,
     pub(super) request_url: String,
 }
 
@@ -26,13 +27,14 @@ impl<'a> AuthenticationRequestGenerator<'a> {
     }
 
     pub(super) fn generate(&self) -> AuthenticationRequest {
-        let state = self.generate_state();
-        let request_url = self.build_request_url(&state);
+        let state = self.generate_random_string();
+        let nonce = self.generate_random_string();
+        let request_url = self.build_request_url(&state, &nonce);
 
-        AuthenticationRequest { state, request_url }
+        AuthenticationRequest { state, nonce, request_url }
     }
 
-    fn build_request_url(&self, state: &str) -> String {
+    fn build_request_url(&self, state: &str, nonce: &str) -> String {
         let secrets = Secrets::default();
         let client_id = secrets.google_auth.client_id();
         let redirect_uri = format!("{}/auth/google/callback", self.config.app.base_url);
@@ -43,13 +45,14 @@ impl<'a> AuthenticationRequestGenerator<'a> {
             ("response_type", "code".to_owned()),
             ("scope", "openid email".to_owned()),
             ("state", state.to_owned()),
+            ("nonce", nonce.to_owned()),
         ]).unwrap();
         url.into()
     }
 
-    fn generate_state(&self) -> String {
+    fn generate_random_string(&self) -> String {
         let mut rng = StdRng::from_os_rng();
-        let mut bytes = [0u8; 120];
+        let mut bytes = [0u8; 36];
         rng.fill(&mut bytes[..]);
 
         URL_SAFE.encode(bytes)
