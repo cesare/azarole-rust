@@ -21,6 +21,7 @@ clap = { version = "~4.5.48", features = ["derive"] }
 chrono = { version = "~0.4.42", features = ["serde"] }
 env_logger = "~0.11.8"
 futures-util = "~0.3.31"
+jsonwebtoken = { version = "10.0.0", features = ["rust_crypto"] }
 hex = "~0.4.3"
 hmac = "~0.12.1"
 log = "~0.4.28"
