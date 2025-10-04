@@ -55,7 +55,7 @@ async fn callback(context: Data<ApplicationContext>, session: Session, params: Q
             handle_success(context, session, code, state).await
         },
         _ => {
-            handle_failure(context, session, parameters.error).await
+            handle_failure(session).await
         },
     }
 }
@@ -87,8 +87,7 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
     Ok(response)
 }
 
-#[allow(unused_variables)]
-async fn handle_failure(context: Data<ApplicationContext>, session: Session, error: Option<String>) -> Result<HttpResponse, PerRequestError> {
+async fn handle_failure(session: Session) -> Result<HttpResponse, PerRequestError> {
     session.remove("google-auth-state");
     session.remove("google-auth-nonce");
 
