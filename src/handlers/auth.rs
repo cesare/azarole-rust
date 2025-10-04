@@ -2,10 +2,10 @@ use std::{ops::Deref, sync::Arc};
 
 use actix_session::Session;
 use actix_web::{
-    http::header, web::{get, post, Data, Query, ServiceConfig}, HttpResponse
+    http::header, web::{get, Data, Query, ServiceConfig}, HttpResponse
 };
-use log::debug;
 use serde::Deserialize;
+use serde_json::json;
 use thiserror::Error;
 
 use crate::{
@@ -16,13 +16,15 @@ use crate::{
 mod access_token_request;
 mod authentication_request;
 mod id_token_verifier;
+mod user_finder;
 use access_token_request::AccessTokenRequest;
 use authentication_request::AuthenticationRequestGenerator;
 use id_token_verifier::IdTokenVerifier;
+use user_finder::UserFinder;
 
 pub fn routes(config: &mut ServiceConfig) {
     config
-        .route("", post().to(request_authentication))
+        .route("", get().to(request_authentication))
         .route("/callback", get().to(callback));
 }
 
@@ -58,10 +60,7 @@ async fn callback(context: Data<ApplicationContext>, session: Session, params: Q
     }
 }
 
-#[allow(unused_variables)]
 async fn handle_success(context: Data<ApplicationContext>, session: Session, code: String, state: String) -> Result<HttpResponse, PerRequestError> {
-    debug!("callback: success {}, {}", code, state);
-
     let saved_nonce = fetch_saved_string(&session, "google-auth-nonce")?;
     let saved_state = fetch_saved_string(&session, "google-auth-state")?;
     if state != saved_state {
@@ -74,17 +73,22 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
     let id_token_verifier = IdTokenVerifier::new(&access_token_response.id_token, &saved_nonce);
     let claims = id_token_verifier.verify().await?;
 
+    let finder = UserFinder::new(Arc::clone(&context), &claims.sub);
+    let user = finder.execute().await?;
+
     session.clear();
     session.renew();
+    session.insert("user_id", user.id)?;
 
-    let response = HttpResponse::Ok().finish();
+    let response_json = json!({
+        "user": { "id": user.id },
+    });
+    let response = HttpResponse::Ok().json(response_json);
     Ok(response)
 }
 
 #[allow(unused_variables)]
 async fn handle_failure(context: Data<ApplicationContext>, session: Session, error: Option<String>) -> Result<HttpResponse, PerRequestError> {
-    debug!("callback: failure {}", error.unwrap_or_default());
-
     session.remove("google-auth-state");
     session.remove("google-auth-nonce");
 

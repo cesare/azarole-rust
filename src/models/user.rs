@@ -1,9 +1,12 @@
-#[derive(Clone, Copy, sqlx::Type)]
+use serde::{Deserialize, Serialize};
+use sqlx::prelude::FromRow;
+
+#[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
 #[repr(transparent)]
 pub struct UserId(u32);
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, FromRow, Serialize)]
 pub struct User {
     pub id: UserId,
 }

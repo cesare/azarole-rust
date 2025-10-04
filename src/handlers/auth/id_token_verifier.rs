@@ -1,6 +1,5 @@
-use chrono::Utc;
 use jsonwebtoken::{
-    decode, decode_header, jwk::{Jwk, JwkSet}, DecodingKey, Validation
+    decode, decode_header, jwk::{Jwk, JwkSet}, Algorithm, DecodingKey, Validation
 };
 use serde::Deserialize;
 
@@ -57,20 +56,15 @@ impl IdTokenVerifier {
 
     fn verify_id_token(&self, jwk: &Jwk) -> Result<Claims, AuthError> {
         let decoding_key = DecodingKey::from_jwk(jwk)?;
-        let jwt = decode::<Claims>(&self.token, &decoding_key, &Validation::default())?;
-
-        let claims = jwt.claims;
 
         let secrets = Secrets::default();
         let client_id = secrets.google_auth.client_id();
-        if claims.aud != client_id {
-            return Err(AuthError::InvalidIdToken);
-        }
 
-        let current_time = Utc::now().timestamp();
-        if claims.exp < current_time {
-            return Err(AuthError::InvalidIdToken);
-        }
+        let mut validation = Validation::new(Algorithm::RS256);
+        validation.set_audience(&[client_id]);
+
+        let jwt = decode::<Claims>(&self.token, &decoding_key, &validation)?;
+        let claims = jwt.claims;
 
         if claims.nonce != self.nonce {
             return Err(AuthError::InvalidIdToken);
