@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
 use actix_session::Session;
 use actix_web::{
@@ -15,8 +15,10 @@ use crate::{
 
 mod access_token_request;
 mod authentication_request;
+mod id_token_verifier;
 use access_token_request::AccessTokenRequest;
 use authentication_request::AuthenticationRequestGenerator;
+use id_token_verifier::IdTokenVerifier;
 
 pub fn routes(config: &mut ServiceConfig) {
     config
@@ -66,8 +68,11 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
         return Err(PerRequestError::Unauthorized)
     }
 
-    let access_token_request = AccessTokenRequest::new(Arc::clone(&context.into_inner()));
+    let access_token_request = AccessTokenRequest::new(Arc::clone(context.deref()));
     let access_token_response = access_token_request.execute(&code).await?;
+
+    let id_token_verifier = IdTokenVerifier::new(&access_token_response.id_token, &saved_nonce);
+    let claims = id_token_verifier.verify().await?;
 
     session.clear();
     session.renew();
@@ -98,11 +103,20 @@ fn fetch_saved_string(session: &Session, key: &str) -> Result<String, PerRequest
 enum AuthError {
     #[error("request failed")]
     RequestFailed,
+
+    #[error("invalid id token")]
+    InvalidIdToken,
 }
 
 impl From<reqwest::Error> for AuthError {
     fn from(_value: reqwest::Error) -> Self {
         Self::RequestFailed
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for AuthError {
+    fn from(_value: jsonwebtoken::errors::Error) -> Self {
+        Self::InvalidIdToken
     }
 }
 

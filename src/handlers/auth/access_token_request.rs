@@ -21,7 +21,7 @@ struct Parameters {
 #[allow(dead_code)]
 pub(super) struct AccessTokenResponse {
     access_token: String,
-    id_token: String,
+    pub(super) id_token: String,
     expires_in: u32,
     scope: String,
     token_type: String,
