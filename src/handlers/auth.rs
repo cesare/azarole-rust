@@ -4,13 +4,12 @@ use actix_session::Session;
 use actix_web::{
     http::header, web::{get, Data, Query, ServiceConfig}, HttpResponse
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 use thiserror::Error;
 
 use crate::{
-    context::ApplicationContext,
-    errors::PerRequestError,
+    config::ApplicationConfig, context::ApplicationContext, errors::PerRequestError
 };
 
 mod access_token_request;
@@ -126,5 +125,21 @@ impl From<jsonwebtoken::errors::Error> for AuthError {
 impl From<AuthError> for PerRequestError {
     fn from(_value: AuthError) -> Self {
         PerRequestError::ServerError
+    }
+}
+
+#[derive(Serialize)]
+#[repr(transparent)]
+struct RedirectUri(String);
+
+impl RedirectUri {
+    fn new(config: &ApplicationConfig) -> Self {
+        Self(format!("{}/auth/google/callback", config.app.base_url))
+    }
+}
+
+impl Into<String> for RedirectUri {
+    fn into(self) -> String {
+        self.0
     }
 }

@@ -6,7 +6,7 @@ use crate::{
     context::ApplicationContext,
     secrets::Secrets,
 };
-use super::AuthError;
+use super::{AuthError, RedirectUri};
 
 #[derive(Serialize)]
 struct Parameters {
@@ -14,7 +14,7 @@ struct Parameters {
     client_secret: String,
     code: String,
     grant_type: String,
-    redirect_uri: String,
+    redirect_uri: RedirectUri,
 }
 
 #[derive(Deserialize)]
@@ -40,7 +40,7 @@ impl AccessTokenRequest {
         let secrets = Secrets::default();
         let client_id = secrets.google_auth.client_id().clone();
         let client_secret = secrets.google_auth.client_secret().clone();
-        let redirect_uri = format!("{}/auth/google/callback", self.context.config.app.base_url);
+        let redirect_uri = RedirectUri::new(&self.context.config);
 
         let parameters = Parameters {
             client_id,
