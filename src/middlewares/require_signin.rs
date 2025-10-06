@@ -8,7 +8,7 @@ use actix_web::web::Data;
 use futures_util::future::{ok, LocalBoxFuture, Ready};
 
 use crate::context::ApplicationContext;
-use crate::models::User;
+use crate::models::{User, UserId};
 
 pub struct RequireSignin;
 
@@ -59,7 +59,7 @@ where
 
         Box::pin(async move {
             let session = req.get_session();
-            let value = session.get::<String>("user_id")?;
+            let value = session.get::<UserId>("user_id")?;
             if value.is_none() {
                 return Err(actix_web::error::ErrorUnauthorized("unauthorized"));
             }
