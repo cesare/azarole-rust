@@ -69,7 +69,7 @@ where
             let context: &Data<ApplicationContext> = req.app_data().unwrap();
             let result: Result<Option<User>, sqlx::error::Error> =
                 sqlx::query_as("select id from users where id = $1")
-                    .bind(&user_id)
+                    .bind(user_id)
                     .fetch_optional(&context.database.pool)
                     .await;
 
