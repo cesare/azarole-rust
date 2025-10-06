@@ -138,8 +138,8 @@ impl RedirectUri {
     }
 }
 
-impl Into<String> for RedirectUri {
-    fn into(self) -> String {
-        self.0
+impl From<RedirectUri> for String {
+    fn from(value: RedirectUri) -> Self {
+        value.0
     }
 }
