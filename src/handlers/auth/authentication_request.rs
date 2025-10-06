@@ -38,7 +38,7 @@ impl<'a> AuthenticationRequestGenerator<'a> {
     fn build_request_url(&self, state: &str, nonce: &str) -> String {
         let secrets = Secrets::default();
         let client_id = secrets.google_auth.client_id();
-        let redirect_uri = RedirectUri::new(&self.config);
+        let redirect_uri = RedirectUri::new(self.config);
 
         let url = Url::parse_with_params("https://accounts.google.com/o/oauth2/v2/auth", &[
             ("client_id", client_id),

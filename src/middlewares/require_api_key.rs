@@ -66,7 +66,7 @@ where
             let bearer_auth = BearerAuth::extract(req.request()).await?;
             let token = bearer_auth.token();
 
-            let authenticator = ApiKeyAuthenticator::new(Arc::clone(&context), token);
+            let authenticator = ApiKeyAuthenticator::new(Arc::clone(context), token);
             let result = authenticator.authenticate().await;
             match result {
                 Ok(Some(user)) => {

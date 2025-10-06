@@ -21,11 +21,11 @@ impl UserFinder {
     pub(super) async fn execute(self) -> Result<User, DatabaseError> {
         let mut tx = self.context.database.pool.begin().await?;
 
-        if let Some(user) = self.find(&mut *tx).await? {
+        if let Some(user) = self.find(&mut tx).await? {
             return Ok(user);
         }
 
-        let user = self.create(&mut *tx).await?;
+        let user = self.create(&mut tx).await?;
         tx.commit().await?;
 
         Ok(user)
@@ -43,14 +43,14 @@ impl UserFinder {
         let now = Utc::now();
 
         let user: User = sqlx::query_as("insert into users (created_at) values ($1) returning id")
-            .bind(&now)
+            .bind(now)
             .fetch_one(&mut *connection)
             .await?;
 
         sqlx::query("insert into google_authenticated_users (user_id, uid, created_at) values ($1, $2, $3)")
-            .bind(&user.id)
+            .bind(user.id)
             .bind(&self.identifier)
-            .bind(&now)
+            .bind(now)
             .execute(connection)
             .await?;
         Ok(user)
