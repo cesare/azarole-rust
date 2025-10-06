@@ -12,9 +12,9 @@ pub struct WorkplaceId(u32);
 
 #[derive(Clone, Deserialize, FromRow, Serialize)]
 pub struct Workplace {
-    id: WorkplaceId,
-    user_id: UserId,
-    name: String,
+    pub id: WorkplaceId,
+    pub user_id: UserId,
+    pub name: String,
 }
 
 pub struct WorkplaceResources<'a> {
