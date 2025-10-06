@@ -57,6 +57,9 @@ async fn main() -> anyhow::Result<()> {
             .service(
                 scope("/auth/google").configure(handlers::auth::routes)
             )
+            .service(
+                scope("/signout").configure(handlers::signout::routes)
+            )
     });
     server.bind((server_config.bind, server_config.port))?.run().await?;
     Ok(())
