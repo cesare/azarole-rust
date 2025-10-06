@@ -3,7 +3,7 @@ use actix_session::{SessionMiddleware, storage::CookieSessionStore};
 use actix_web::cookie::Key;
 use actix_web::http::header;
 use actix_web::middleware::Logger;
-use actix_web::web::{scope, Data};
+use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use env_logger::Env;
 
@@ -18,7 +18,6 @@ mod secrets;
 
 use self::config::ApplicationConfig;
 use self::context::ApplicationContext;
-use self::middlewares::require_api_key::RequireApiKey;
 use self::secrets::Secrets;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
@@ -49,17 +48,7 @@ async fn main() -> anyhow::Result<()> {
             .wrap(build_cors(&config))
             .wrap(build_session_middleware())
             .app_data(Data::new(context.clone()))
-            .service(
-                scope("/api")
-                    .wrap(RequireApiKey::new())
-                    .configure(handlers::api::routes)
-            )
-            .service(
-                scope("/auth/google").configure(handlers::auth::routes)
-            )
-            .service(
-                scope("/signout").configure(handlers::signout::routes)
-            )
+            .configure(handlers::routes)
     });
     server.bind((server_config.bind, server_config.port))?.run().await?;
     Ok(())

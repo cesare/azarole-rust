@@ -5,7 +5,7 @@ use actix_web::{
 
 use crate::errors::PerRequestError;
 
-pub fn routes(config: &mut ServiceConfig) {
+pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", delete().to(signout));
 }

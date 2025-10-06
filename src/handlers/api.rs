@@ -10,7 +10,7 @@ use crate::models::attendance_record::Event;
 use crate::models::{AttendanceRegistration, WorkplaceId};
 use crate::models::User;
 
-pub fn routes(config: &mut ServiceConfig) {
+pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("/workplaces/{workplace_id}/clock_ins", post().to(clock_in))
         .route("/workplaces/{workplace_id}/clock_outs", post().to(clock_out));

@@ -21,7 +21,7 @@ use authentication_request::AuthenticationRequestGenerator;
 use id_token_verifier::IdTokenVerifier;
 use user_finder::UserFinder;
 
-pub fn routes(config: &mut ServiceConfig) {
+pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", get().to(request_authentication))
         .route("/callback", get().to(callback));
