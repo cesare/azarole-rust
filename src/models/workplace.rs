@@ -1,3 +1,4 @@
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
@@ -33,5 +34,19 @@ impl<'a> WorkplaceResources<'a> {
             .fetch_all(&self.context.database.pool)
             .await?;
         Ok(workplaces)
+    }
+
+    pub async fn create(&self, name: &str) -> Result<Workplace, DatabaseError> {
+        let statement = "insert into workplaces (user_id, name, created_at updated_at) values ($1, $2, $3, $4) returning id, user_id, name";
+        let now = Utc::now();
+
+        let workplace: Workplace = sqlx::query_as(statement)
+            .bind(self.user.id)
+            .bind(name)
+            .bind(now)
+            .bind(now)
+            .fetch_one(&self.context.database.pool)
+            .await?;
+        Ok(workplace)
     }
 }

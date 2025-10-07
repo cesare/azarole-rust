@@ -1,8 +1,8 @@
 use actix_web::{
-    web::{Data, ReqData, ServiceConfig, get},
+    web::{Data, Form, ReqData, ServiceConfig, get, post},
     HttpResponse
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
@@ -31,7 +31,8 @@ impl<'a> WorkplaceView<'a> {
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
-        .route("", get().to(index));
+        .route("", get().to(index))
+        .route("", post().to(create));
 }
 
 async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>) -> Result<HttpResponse, PerRequestError> {
@@ -42,5 +43,21 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>) -
         "workplaces": workplaces.iter().map(WorkplaceView::new).collect::<Vec<WorkplaceView>>(),
     });
     let response = HttpResponse::Ok().json(response_json);
+    Ok(response)
+}
+
+#[derive(Deserialize)]
+struct CreatingWorkplaceForm {
+    name: String,
+}
+
+async fn create(context: Data<ApplicationContext>, current_user: ReqData<User>, form: Form<CreatingWorkplaceForm>)  -> Result<HttpResponse, PerRequestError> {
+    let resources = WorkplaceResources::new(&context, &current_user);
+    let workpalce = resources.create(&form.name).await?;
+
+    let response_json = json!({
+        "workplace": WorkplaceView::new(&workpalce),
+    });
+    let response = HttpResponse::Created().json(response_json);
     Ok(response)
 }
