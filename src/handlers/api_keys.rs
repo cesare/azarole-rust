@@ -1,5 +1,5 @@
 use actix_web::{
-    web::{delete, get, Data, Path, ReqData, ServiceConfig},
+    web::{delete, get, post, Data, Form, Path, ReqData, ServiceConfig},
     HttpResponse
 };
 use serde::{Deserialize, Serialize};
@@ -10,6 +10,9 @@ use crate::{
     errors::PerRequestError,
     models::{ApiKey, ApiKeyId, ApiKeyResources, User},
 };
+
+mod registration;
+use registration::ApiKeyRegistration;
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -30,6 +33,7 @@ impl<'a> ApiKeyView<'a> {
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", get().to(index))
+        .route("", post().to(create))
         .route("/{id}", delete().to(destroy));
 }
 
@@ -39,6 +43,22 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>) -
 
     let response_json = json!({
         "api_keys": api_keys.iter().map(ApiKeyView::new).collect::<Vec<ApiKeyView>>(),
+    });
+    let response = HttpResponse::Ok().json(response_json);
+    Ok(response)
+}
+
+#[derive(Deserialize)]
+struct CreatingApiKeyForm {
+    name: String,
+}
+
+async fn create(context: Data<ApplicationContext>, current_user: ReqData<User>, form: Form<CreatingApiKeyForm>) -> Result<HttpResponse, PerRequestError> {
+    let registration = ApiKeyRegistration::new(&context, &current_user, &form.name);
+    let registration_details = registration.execute().await?;
+
+    let response_json = json!({
+        "api_key": registration_details,
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)
