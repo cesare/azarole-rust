@@ -4,7 +4,7 @@ pub mod attendance_registration;
 pub mod user;
 pub mod workplace;
 
-pub use api_key::ApiKey;
+pub use api_key::{ApiKey, ApiKeyId, ApiKeyResources};
 pub use attendance_record::AttendanceRecord;
 pub use attendance_registration::AttendanceRegistration;
 pub use user::{User, UserId};
