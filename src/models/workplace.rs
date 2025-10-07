@@ -49,4 +49,14 @@ impl<'a> WorkplaceResources<'a> {
             .await?;
         Ok(workplace)
     }
+
+    pub async fn find(&self, id: WorkplaceId) -> Result<Workplace, DatabaseError> {
+        let statement = "select id, user_id, name from workplaces where user_id = $1 and id = $2";
+        let workplace: Workplace = sqlx::query_as(statement)
+            .bind(self.user.id)
+            .bind(id)
+            .fetch_one(&self.context.database.pool)
+            .await?;
+        Ok(workplace)
+    }
 }
