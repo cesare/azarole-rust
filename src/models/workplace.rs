@@ -28,7 +28,7 @@ impl<'a> WorkplaceResources<'a> {
     }
 
     pub async fn list(&self) -> Result<Vec<Workplace>, DatabaseError> {
-        let workplaces: Vec<Workplace> = sqlx::query_as("select id, user_id, name from workplaces where user_id = $1")
+        let workplaces: Vec<Workplace> = sqlx::query_as("select id, user_id, name from workplaces where user_id = $1 order by id")
             .bind(self.user.id)
             .fetch_all(&self.context.database.pool)
             .await?;
