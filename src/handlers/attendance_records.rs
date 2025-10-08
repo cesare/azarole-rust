@@ -1,0 +1,103 @@
+use actix_web::{
+    web::{get, Data, Path, Query, ReqData, ServiceConfig},
+    HttpResponse
+};
+use chrono::{DateTime, Datelike, Local, Utc};
+use serde::{Deserialize, Serialize};
+use serde_json::json;
+
+use crate::{
+    context::ApplicationContext,
+    errors::PerRequestError,
+    models::{
+        attendance_record,
+        AttendanceRecord, AttendanceRecordId,
+        WorkplaceId, WorkplaceResources,
+        User,
+    },
+};
+
+mod listing;
+use listing::{TargetMonth, AttendancesForMonth};
+
+pub(super) fn routes(config: &mut ServiceConfig) {
+    config
+        .route("", get().to(index));
+}
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[repr(transparent)]
+struct Year(i32);
+
+impl Default for Year {
+    fn default() -> Self {
+        Self(Local::now().year())
+    }
+}
+
+impl From<Year> for i32 {
+    fn from(value: Year) -> Self {
+        value.0
+    }
+}
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[repr(transparent)]
+struct Month(u32);
+
+impl Default for Month {
+    fn default() -> Self {
+        Self(Local::now().month())
+    }
+}
+
+impl From<Month> for u32 {
+    fn from(value: Month) -> Self {
+        value.0
+    }
+}
+
+#[derive(Deserialize)]
+struct PathInfo {
+    workplace_id: WorkplaceId,
+}
+
+#[derive(Deserialize)]
+struct IndexParameters {
+    #[serde(default)]
+    year: Year,
+    #[serde(default)]
+    month: Month,
+}
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct AttendanceRecordView<'a> {
+    id: &'a AttendanceRecordId,
+    event: &'a attendance_record::Event,
+    recoreded_at: &'a DateTime<Utc>,
+}
+
+impl<'a> AttendanceRecordView<'a> {
+    fn new(attendance_record: &'a AttendanceRecord) -> Self {
+        Self {
+            id: &attendance_record.id,
+            event: &attendance_record.event,
+            recoreded_at: &attendance_record.recorded_at,
+        }
+    }
+}
+
+async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, params: Query<IndexParameters>) -> Result<HttpResponse, PerRequestError> {
+    let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
+
+    let target_month = TargetMonth::new(params.year.into(), params.month.into());
+    let finder = AttendancesForMonth::new(&context, &workplace, target_month);
+    let attendance_records = finder.execute().await?;
+
+    let response_json = json!({
+        "attendanceRecords": attendance_records.iter().map(AttendanceRecordView::new).collect::<Vec<AttendanceRecordView>>(),
+    });
+    let response = HttpResponse::Ok().json(response_json);
+    Ok(response)
+}

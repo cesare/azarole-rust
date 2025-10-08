@@ -7,6 +7,7 @@ use crate::middlewares::{
 
 mod api;
 mod api_keys;
+mod attendance_records;
 mod auth;
 mod workplaces;
 mod signout;
@@ -21,6 +22,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 
 fn backend_routes(config: &mut ServiceConfig) {
     config
-        .service(scope("/workplaces").configure(workplaces::routes))
-        .service(scope("/api_keys").configure(api_keys::routes));
+        .service(scope("/api_keys").configure(api_keys::routes))
+        .service(scope("/workplaces/{workplace_id}/attendance_records").configure(attendance_records::routes))
+        .service(scope("/workplaces").configure(workplaces::routes));
 }
