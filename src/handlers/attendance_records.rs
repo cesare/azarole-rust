@@ -1,5 +1,5 @@
 use actix_web::{
-    web::{get, Data, Path, Query, ReqData, ServiceConfig},
+    web::{delete, get, Data, Path, Query, ReqData, ServiceConfig},
     HttpResponse
 };
 use chrono::{DateTime, Datelike, Local, Utc};
@@ -11,7 +11,7 @@ use crate::{
     errors::PerRequestError,
     models::{
         attendance_record,
-        AttendanceRecord, AttendanceRecordId,
+        AttendanceRecord, AttendanceRecordId, AttendanceRecordResources,
         WorkplaceId, WorkplaceResources,
         User,
     },
@@ -22,7 +22,8 @@ use listing::{TargetMonth, AttendancesForMonth};
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
-        .route("", get().to(index));
+        .route("", get().to(index))
+        .route("/attendance_records/{id}", delete().to(destroy));
 }
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
@@ -99,5 +100,21 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, p
         "attendanceRecords": attendance_records.iter().map(AttendanceRecordView::new).collect::<Vec<AttendanceRecordView>>(),
     });
     let response = HttpResponse::Ok().json(response_json);
+    Ok(response)
+}
+
+#[derive(Deserialize)]
+struct DestroyPath {
+    workplace_id: WorkplaceId,
+    id: AttendanceRecordId,
+}
+
+async fn destroy(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<DestroyPath>) -> Result<HttpResponse, PerRequestError> {
+    let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
+
+    let resources = AttendanceRecordResources::new(&context, &workplace);
+    resources.destroy(path.id).await?;
+
+    let response = HttpResponse::Ok().finish();
     Ok(response)
 }
