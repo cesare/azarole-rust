@@ -42,7 +42,7 @@ impl<'a> ApiKeyRegistration<'a> {
         let details = RegistationDetails {
             id: api_key.id,
             name: api_key.name,
-            token: token,
+            token,
         };
         Ok(details)
     }
@@ -70,7 +70,7 @@ impl<'a> ApiKeyRegistration<'a> {
         let now = Utc::now();
         let api_key: ApiKey = sqlx::query_as(statement)
             .bind(self.user.id)
-            .bind(&self.name)
+            .bind(self.name)
             .bind(digest)
             .bind(now)
             .fetch_one(&self.context.database.pool)
