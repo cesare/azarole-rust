@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_session::Session;
 use actix_web::{
-    web::{get, post, Data, Query, ServiceConfig}, HttpResponse
+    web::{post, Data, Form, ServiceConfig}, HttpResponse
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -24,7 +24,7 @@ use user_finder::UserFinder;
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", post().to(request_authentication))
-        .route("/callback", get().to(callback));
+        .route("/callback", post().to(callback));
 }
 
 async fn request_authentication(context: Data<ApplicationContext>, session: Session) -> Result<HttpResponse, PerRequestError> {
@@ -48,7 +48,7 @@ struct CallbackParameters {
     error: Option<String>,
 }
 
-async fn callback(context: Data<ApplicationContext>, session: Session, params: Query<CallbackParameters>) -> Result<HttpResponse, PerRequestError> {
+async fn callback(context: Data<ApplicationContext>, session: Session, params: Form<CallbackParameters>) -> Result<HttpResponse, PerRequestError> {
     let parameters = params.into_inner();
     match parameters {
         CallbackParameters { code: Some(code), state: Some(state), error: None } => {
