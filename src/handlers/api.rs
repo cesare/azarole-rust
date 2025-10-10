@@ -4,11 +4,17 @@ use actix_web::web::{post, Data, Path, ReqData, ServiceConfig};
 use actix_web::{HttpResponse, Result};
 use serde_json::json;
 
-use crate::context::ApplicationContext;
-use crate::errors::PerRequestError;
-use crate::models::attendance_record::Event;
-use crate::models::{AttendanceRegistration, WorkplaceId};
-use crate::models::User;
+use crate::{
+    context::ApplicationContext,
+    errors::PerRequestError,
+    models::{
+        attendance_record::Event,
+        WorkplaceId, User,
+    },
+};
+
+mod attendance_registration;
+use attendance_registration::AttendanceRegistration;
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
