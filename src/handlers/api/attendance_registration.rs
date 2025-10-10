@@ -13,16 +13,16 @@ use crate::{
     }
 };
 
-pub struct AttendanceRegistration {
+pub(super) struct AttendanceRegistration {
     context: Arc<ApplicationContext>,
 }
 
 impl AttendanceRegistration {
-    pub fn new(context: Arc<ApplicationContext>) -> Self {
+    pub(super) fn new(context: Arc<ApplicationContext>) -> Self {
         Self { context }
     }
 
-    pub async fn execute(&self, user: &User, workplace_id: WorkplaceId, event: Event) -> Result<AttendanceRecord, DatabaseError> {
+    pub(super) async fn execute(&self, user: &User, workplace_id: WorkplaceId, event: Event) -> Result<AttendanceRecord, DatabaseError> {
         self.ensure_workplace(user, workplace_id).await?;
         self.create_attendance(workplace_id, event).await
     }
