@@ -135,7 +135,7 @@ struct RedirectUri(String);
 
 impl RedirectUri {
     fn new(config: &ApplicationConfig) -> Self {
-        Self(format!("{}/auth/google/callback", config.app.base_url))
+        Self(format!("{}/signin/callback", config.frontend.base_url))
     }
 }
 
