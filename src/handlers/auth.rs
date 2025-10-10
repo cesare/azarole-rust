@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use actix_session::Session;
 use actix_web::{
-    http::header, web::{get, Data, Query, ServiceConfig}, HttpResponse
+    web::{get, post, Data, Query, ServiceConfig}, HttpResponse
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -23,7 +23,7 @@ use user_finder::UserFinder;
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
-        .route("", get().to(request_authentication))
+        .route("", post().to(request_authentication))
         .route("/callback", get().to(callback));
 }
 
@@ -34,9 +34,10 @@ async fn request_authentication(context: Data<ApplicationContext>, session: Sess
     session.insert("google-auth-state", &authentication_request.state)?;
     session.insert("google-auth-nonce", &authentication_request.nonce)?;
 
-    let response = HttpResponse::Found()
-        .insert_header((header::LOCATION, authentication_request.request_url))
-        .finish();
+    let response_json = json!({
+        "location": authentication_request.request_url,
+    });
+    let response = HttpResponse::Ok().json(response_json);
     Ok(response)
 }
 
