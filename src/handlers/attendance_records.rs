@@ -117,7 +117,7 @@ async fn create(context: Data<ApplicationContext>, current_user: ReqData<User>, 
     let attendance_record = resources.create(&form.event, &form.datetime.to_utc()).await?;
 
     let response_json = json!({
-        "attendance_record": AttendanceRecordView::new(&attendance_record),
+        "attendanceRecord": AttendanceRecordView::new(&attendance_record),
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)
