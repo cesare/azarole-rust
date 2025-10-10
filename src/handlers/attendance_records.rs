@@ -1,5 +1,5 @@
 use actix_web::{
-    web::{delete, get, Data, Path, Query, ReqData, ServiceConfig},
+    web::{delete, get, post, Data, Form, Path, Query, ReqData, ServiceConfig},
     HttpResponse
 };
 use chrono::{DateTime, Datelike, Local, Utc};
@@ -23,6 +23,7 @@ use listing::{TargetMonth, AttendancesForMonth};
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", get().to(index))
+        .route("", post().to(create))
         .route("/attendance_records/{id}", delete().to(destroy));
 }
 
@@ -98,6 +99,25 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, p
 
     let response_json = json!({
         "attendanceRecords": attendance_records.iter().map(AttendanceRecordView::new).collect::<Vec<AttendanceRecordView>>(),
+    });
+    let response = HttpResponse::Ok().json(response_json);
+    Ok(response)
+}
+
+#[derive(Deserialize)]
+struct CreationParameters {
+    event: attendance_record::Event,
+    datetime: DateTime<Local>,
+}
+
+async fn create(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, form: Form<CreationParameters>) -> Result<HttpResponse, PerRequestError> {
+    let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
+
+    let resources = AttendanceRecordResources::new(&context, &workplace);
+    let attendance_record = resources.create(&form.event, &form.datetime.to_utc()).await?;
+
+    let response_json = json!({
+        "attendance_record": AttendanceRecordView::new(&attendance_record),
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)

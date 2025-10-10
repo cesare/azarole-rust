@@ -35,6 +35,19 @@ impl<'a> AttendanceRecordResources<'a> {
         Self { context, workplace }
     }
 
+    pub async fn create(&self, event: &Event, datetime: &DateTime<Utc>) -> Result<AttendanceRecord, DatabaseError> {
+        let statement = "insert into attendance_records (workplace_id, event, recorded_at, created_at) values ($1, $2, $3, $4) returning id, workplace_id, event, recorded_at";
+        let now = Utc::now();
+        let attendance_record = sqlx::query_as(statement)
+            .bind(self.workplace.id)
+            .bind(event)
+            .bind(datetime)
+            .bind(now)
+            .fetch_one(&self.context.database.pool)
+            .await?;
+        Ok(attendance_record)
+    }
+
     pub async fn destroy(&self, id: AttendanceRecordId) -> Result<(), DatabaseError> {
         let statement = "delete from attendance_records where id = $1 and workplace_id = $2";
         sqlx::query(statement)
