@@ -9,6 +9,7 @@ mod api;
 mod api_keys;
 mod attendance_records;
 mod auth;
+mod current_user;
 mod workplaces;
 mod signout;
 
@@ -23,6 +24,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 fn backend_routes(config: &mut ServiceConfig) {
     config
         .service(scope("/api_keys").configure(api_keys::routes))
+        .service(scope("/current_user").configure(current_user::routes))
         .service(scope("/workplaces/{workplace_id}/attendance_records").configure(attendance_records::routes))
         .service(scope("/workplaces").configure(workplaces::routes));
 }
