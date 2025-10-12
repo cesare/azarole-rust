@@ -80,6 +80,7 @@ where
                     Ok(response)
                 },
                 Ok(None) => {
+                    session.remove("user_id");
                     Err(actix_web::error::ErrorUnauthorized("unauthorized"))
                 },
                 Err(_err) => {
