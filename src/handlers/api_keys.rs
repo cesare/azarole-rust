@@ -2,33 +2,18 @@ use actix_web::{
     web::{delete, get, post, Data, Form, Path, ReqData, ServiceConfig},
     HttpResponse
 };
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 
 use crate::{
     context::ApplicationContext,
     errors::PerRequestError,
-    models::{ApiKey, ApiKeyId, ApiKeyResources, User},
+    models::{ApiKeyId, ApiKeyResources, User},
 };
+use super::views::ApiKeyView;
 
 mod registration;
 use registration::ApiKeyRegistration;
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct ApiKeyView<'a> {
-    id: &'a ApiKeyId,
-    name: &'a String,
-}
-
-impl<'a> ApiKeyView<'a> {
-    fn new(api_key: &'a ApiKey) -> Self {
-        Self {
-            id: &api_key.id,
-            name: &api_key.name,
-        }
-    }
-}
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config

@@ -3,8 +3,24 @@ use serde::Serialize;
 
 use crate::models::{
     attendance_record,
-    AttendanceRecord, AttendanceRecordId, Workplace, WorkplaceId,
+    ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, Workplace, WorkplaceId,
 };
+
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(in crate::handlers) struct ApiKeyView<'a> {
+    id: &'a ApiKeyId,
+    name: &'a String,
+}
+
+impl<'a> ApiKeyView<'a> {
+    pub(in crate::handlers) fn new(api_key: &'a ApiKey) -> Self {
+        Self {
+            id: &api_key.id,
+            name: &api_key.name,
+        }
+    }
+}
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
