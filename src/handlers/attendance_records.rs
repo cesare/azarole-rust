@@ -2,16 +2,16 @@ use actix_web::{
     web::{delete, get, post, Data, Form, Path, Query, ReqData, ServiceConfig},
     HttpResponse
 };
-use chrono::{DateTime, Datelike, Local, Utc};
+use chrono::{DateTime, Datelike, Local};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
     context::ApplicationContext, errors::PerRequestError, models::{
-        attendance_record, AttendanceRecord, AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources
+        attendance_record, AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources
     }
 };
-use super::views::WorkplaceView;
+use super::views::{AttendanceRecordView, WorkplaceView};
 
 mod listing;
 use listing::{TargetMonth, AttendancesForMonth};
@@ -66,24 +66,6 @@ struct IndexParameters {
     year: Year,
     #[serde(default)]
     month: Month,
-}
-
-#[derive(Serialize)]
-#[serde(rename_all = "camelCase")]
-struct AttendanceRecordView<'a> {
-    id: &'a AttendanceRecordId,
-    event: &'a attendance_record::Event,
-    recoreded_at: &'a DateTime<Utc>,
-}
-
-impl<'a> AttendanceRecordView<'a> {
-    fn new(attendance_record: &'a AttendanceRecord) -> Self {
-        Self {
-            id: &attendance_record.id,
-            event: &attendance_record.event,
-            recoreded_at: &attendance_record.recorded_at,
-        }
-    }
 }
 
 async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, params: Query<IndexParameters>) -> Result<HttpResponse, PerRequestError> {
