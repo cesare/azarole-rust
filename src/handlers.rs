@@ -12,6 +12,7 @@ mod auth;
 mod current_user;
 mod workplaces;
 mod signout;
+mod views;
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config

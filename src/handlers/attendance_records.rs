@@ -7,10 +7,11 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
-    context::ApplicationContext, errors::PerRequestError, handlers::workplaces::WorkplaceView, models::{
+    context::ApplicationContext, errors::PerRequestError, models::{
         attendance_record, AttendanceRecord, AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources
     }
 };
+use super::views::WorkplaceView;
 
 mod listing;
 use listing::{TargetMonth, AttendancesForMonth};
