@@ -94,10 +94,12 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, p
     let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
 
     let target_month = TargetMonth::new(params.year.into(), params.month.into());
-    let finder = AttendancesForMonth::new(&context, &workplace, target_month);
+    let finder = AttendancesForMonth::new(&context, &workplace, &target_month);
     let attendance_records = finder.execute().await?;
 
     let response_json = json!({
+        "year": &target_month.year,
+        "month": &target_month.month,
         "attendanceRecords": attendance_records.iter().map(AttendanceRecordView::new).collect::<Vec<AttendanceRecordView>>(),
     });
     let response = HttpResponse::Ok().json(response_json);

@@ -5,8 +5,8 @@ use crate::{
 };
 
 pub(super) struct TargetMonth {
-    year: i32,
-    month: u32,
+    pub(super) year: i32,
+    pub(super) month: u32,
 }
 
 impl TargetMonth {
@@ -34,11 +34,11 @@ impl TargetMonth {
 pub(super) struct AttendancesForMonth<'a> {
     context: &'a ApplicationContext,
     workplace: &'a Workplace,
-    target_month: TargetMonth,
+    target_month: &'a TargetMonth,
 }
 
 impl<'a> AttendancesForMonth<'a> {
-    pub(super) fn new(context: &'a ApplicationContext, workplace: &'a Workplace, target_month: TargetMonth) -> Self {
+    pub(super) fn new(context: &'a ApplicationContext, workplace: &'a Workplace, target_month: &'a TargetMonth) -> Self {
         Self { context, workplace, target_month }
     }
 
