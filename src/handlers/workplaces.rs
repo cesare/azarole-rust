@@ -15,13 +15,13 @@ use crate::{
 
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
-struct WorkplaceView<'a> {
+pub(in crate::handlers) struct WorkplaceView<'a> {
     id: &'a WorkplaceId,
     name: &'a String,
 }
 
 impl<'a> WorkplaceView<'a> {
-    fn new(workplace: &'a Workplace) -> Self {
+    pub(in crate::handlers) fn new(workplace: &'a Workplace) -> Self {
         Self {
             id: &workplace.id,
             name: &workplace.name,

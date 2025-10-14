@@ -7,14 +7,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
-    context::ApplicationContext,
-    errors::PerRequestError,
-    models::{
-        attendance_record,
-        AttendanceRecord, AttendanceRecordId, AttendanceRecordResources,
-        WorkplaceId, WorkplaceResources,
-        User,
-    },
+    context::ApplicationContext, errors::PerRequestError, handlers::workplaces::WorkplaceView, models::{
+        attendance_record, AttendanceRecord, AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources
+    }
 };
 
 mod listing;
@@ -100,6 +95,7 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, p
     let response_json = json!({
         "year": &target_month.year,
         "month": &target_month.month,
+        "workplace": WorkplaceView::new(&workplace),
         "attendanceRecords": attendance_records.iter().map(AttendanceRecordView::new).collect::<Vec<AttendanceRecordView>>(),
     });
     let response = HttpResponse::Ok().json(response_json);
