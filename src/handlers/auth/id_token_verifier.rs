@@ -17,17 +17,14 @@ pub(super) struct Claims {
     pub(super) sub: String,
 }
 
-pub(super) struct IdTokenVerifier {
-    token: String,
-    nonce: String,
+pub(super) struct IdTokenVerifier<'a> {
+    token: &'a str,
+    nonce: &'a str,
 }
 
-impl IdTokenVerifier {
-    pub(super) fn new(token: &str, nonce: &str) -> Self {
-        Self {
-            token: token.to_owned(),
-            nonce: nonce.to_owned(),
-        }
+impl<'a> IdTokenVerifier<'a> {
+    pub(super) fn new(token: &'a str, nonce: &'a str) -> Self {
+        Self { token, nonce }
     }
 
     pub(super) async fn verify(self) -> Result<Claims, AuthError> {
@@ -47,7 +44,7 @@ impl IdTokenVerifier {
     }
 
     fn find_key_id(&self) -> Result<String, AuthError> {
-        let header = decode_header(&self.token)?;
+        let header = decode_header(self.token)?;
         match header.kid {
             Some(kid) => Ok(kid.to_owned()),
             _ => Err(AuthError::InvalidIdToken)
