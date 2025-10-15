@@ -44,7 +44,7 @@ impl<'a> AttendancesForMonth<'a> {
 
     pub(super) async fn execute(self) -> Result<Vec<AttendanceRecord>, DatabaseError> {
         let (start, end) = self.target_month.datetime_range();
-        let statement = "select id, event, recorded_at from attendance_records where workplace_id = $1 and recorded_at >= $2 and recorded_at < $3 order by recorded_at";
+        let statement = "select id, workplace_id, event, recorded_at from attendance_records where workplace_id = $1 and recorded_at >= $2 and recorded_at < $3 order by recorded_at";
         let attendance_records: Vec<AttendanceRecord> = sqlx::query_as(statement)
             .bind(self.workplace.id)
             .bind(start)
