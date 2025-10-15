@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{ops::Deref, sync::Arc};
 
 use actix_session::Session;
 use actix_web::{
@@ -140,8 +140,10 @@ impl RedirectUri {
     }
 }
 
-impl From<RedirectUri> for String {
-    fn from(value: RedirectUri) -> Self {
-        value.0
+impl Deref for RedirectUri {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }

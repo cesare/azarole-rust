@@ -37,18 +37,15 @@ impl<'a> AuthenticationRequestGenerator<'a> {
 
     fn build_request_url(&self, state: &str, nonce: &str) -> String {
         let secrets = Secrets::default();
-        let client_id = secrets.google_auth.client_id();
-        let redirect_uri = RedirectUri::new(self.config);
-
-        let url = Url::parse_with_params("https://accounts.google.com/o/oauth2/v2/auth", &[
-            ("client_id", client_id),
-            ("redirect_uri", redirect_uri.into()),
-            ("response_type", "code".to_owned()),
-            ("scope", "openid email".to_owned()),
-            ("state", state.to_owned()),
-            ("nonce", nonce.to_owned()),
-        ]).unwrap();
-        url.into()
+        let parameters: &[(&str, &str)] = &[
+            ("client_id", &secrets.google_auth.client_id()),
+            ("redirect_uri", &RedirectUri::new(self.config)),
+            ("response_type", "code"),
+            ("scope", "openid email"),
+            ("state", state),
+            ("nonce", nonce),
+        ];
+        Url::parse_with_params("https://accounts.google.com/o/oauth2/v2/auth", parameters).unwrap().into()
     }
 
     fn generate_random_string(&self) -> String {
