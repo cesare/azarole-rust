@@ -26,7 +26,7 @@ impl<'a> ApiKeyView<'a> {
 pub(in crate::handlers) struct AttendanceRecordView<'a> {
     id: &'a AttendanceRecordId,
     event: &'a attendance_record::Event,
-    recoreded_at: &'a DateTime<Utc>,
+    recorded_at: &'a DateTime<Utc>,
 }
 
 impl<'a> AttendanceRecordView<'a> {
@@ -34,7 +34,7 @@ impl<'a> AttendanceRecordView<'a> {
         Self {
             id: &attendance_record.id,
             event: &attendance_record.event,
-            recoreded_at: &attendance_record.recorded_at,
+            recorded_at: &attendance_record.recorded_at,
         }
     }
 }
