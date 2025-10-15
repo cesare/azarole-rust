@@ -11,6 +11,7 @@ use thiserror::Error;
 use crate::{
     config::ApplicationConfig, context::ApplicationContext, errors::PerRequestError
 };
+use super::views::UserView;
 
 mod access_token_request;
 mod authentication_request;
@@ -81,7 +82,7 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
     session.insert("user_id", user.id)?;
 
     let response_json = json!({
-        "user": { "id": user.id },
+        "user": UserView::new(&user),
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)

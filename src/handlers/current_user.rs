@@ -7,6 +7,7 @@ use crate::{
     errors::PerRequestError,
     models::User,
 };
+use super::views::UserView;
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
@@ -15,7 +16,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 
 async fn current_user(user: ReqData<User>) -> Result<HttpResponse, PerRequestError> {
     let response_json = json!({
-        "user": { "id": user.id },
+        "user": UserView::new(&user),
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)

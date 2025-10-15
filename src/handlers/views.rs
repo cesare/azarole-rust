@@ -2,8 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 
 use crate::models::{
-    attendance_record,
-    ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, Workplace, WorkplaceId,
+    attendance_record, ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, User, UserId, Workplace, WorkplaceId
 };
 
 #[derive(Serialize)]
@@ -40,7 +39,6 @@ impl<'a> AttendanceRecordView<'a> {
     }
 }
 
-
 #[derive(Serialize)]
 #[serde(rename_all = "camelCase")]
 pub(in crate::handlers) struct WorkplaceView<'a> {
@@ -57,3 +55,16 @@ impl<'a> WorkplaceView<'a> {
     }
 }
 
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+pub(in crate::handlers) struct UserView<'a> {
+    id: &'a UserId,
+}
+
+impl<'a> UserView<'a> {
+    pub(in crate::handlers) fn new(user: &'a User) -> Self {
+        Self {
+            id: &user.id,
+        }
+    }
+}
