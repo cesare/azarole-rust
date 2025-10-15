@@ -74,7 +74,7 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
     let id_token_verifier = IdTokenVerifier::new(&access_token_response.id_token, &saved_nonce);
     let claims = id_token_verifier.verify().await?;
 
-    let finder = UserFinder::new(Arc::clone(&context), &claims.sub);
+    let finder = UserFinder::new(&context, &claims.sub);
     let user = finder.execute().await?;
 
     session.clear();
