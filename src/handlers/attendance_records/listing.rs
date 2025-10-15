@@ -10,7 +10,7 @@ pub(super) struct TargetMonth {
 }
 
 impl TargetMonth {
-    pub(super) fn new(year: i32, month: u32) -> Self {
+    pub(super) fn new(year: &i32, month: &u32) -> Self {
         let m = month % 12;
         let y: i32 = (month / 12).try_into().unwrap();
         Self {

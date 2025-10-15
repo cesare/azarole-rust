@@ -1,3 +1,5 @@
+use std::ops::Deref;
+
 use actix_web::{
     web::{delete, get, post, Data, Form, Path, Query, ReqData, ServiceConfig},
     HttpResponse
@@ -39,6 +41,14 @@ impl From<Year> for i32 {
     }
 }
 
+impl Deref for Year {
+    type Target = i32;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 #[derive(Clone, Copy, Deserialize, Serialize)]
 #[repr(transparent)]
 struct Month(u32);
@@ -52,6 +62,14 @@ impl Default for Month {
 impl From<Month> for u32 {
     fn from(value: Month) -> Self {
         value.0
+    }
+}
+
+impl Deref for Month {
+    type Target = u32;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
     }
 }
 
@@ -71,7 +89,7 @@ struct IndexParameters {
 async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, params: Query<IndexParameters>) -> Result<HttpResponse, PerRequestError> {
     let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
 
-    let target_month = TargetMonth::new(params.year.into(), params.month.into());
+    let target_month = TargetMonth::new(&params.year, &params.month);
     let finder = AttendancesForMonth::new(&context, &workplace, &target_month);
     let attendance_records = finder.execute().await?;
 
