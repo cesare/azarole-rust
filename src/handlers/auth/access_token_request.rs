@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -27,12 +25,12 @@ pub(super) struct AccessTokenResponse {
     token_type: String,
 }
 
-pub(super) struct AccessTokenRequest {
-    context: Arc<ApplicationContext>,
+pub(super) struct AccessTokenRequest<'a> {
+    context: &'a ApplicationContext,
 }
 
-impl AccessTokenRequest {
-    pub(super) fn new(context: Arc<ApplicationContext>) -> Self {
+impl<'a> AccessTokenRequest<'a> {
+    pub(super) fn new(context: &'a ApplicationContext) -> Self {
         Self { context }
     }
 

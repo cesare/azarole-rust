@@ -1,4 +1,4 @@
-use std::{ops::Deref, sync::Arc};
+use std::ops::Deref;
 
 use actix_session::Session;
 use actix_web::{
@@ -68,7 +68,7 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
         return Err(PerRequestError::Unauthorized)
     }
 
-    let access_token_request = AccessTokenRequest::new(Arc::clone(&context));
+    let access_token_request = AccessTokenRequest::new(&context);
     let access_token_response = access_token_request.execute(&code).await?;
 
     let id_token_verifier = IdTokenVerifier::new(&access_token_response.id_token, &saved_nonce);
