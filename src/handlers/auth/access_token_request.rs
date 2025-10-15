@@ -9,12 +9,12 @@ use crate::{
 use super::{AuthError, RedirectUri};
 
 #[derive(Serialize)]
-struct Parameters {
-    client_id: String,
-    client_secret: String,
-    code: String,
-    grant_type: String,
-    redirect_uri: RedirectUri,
+struct Parameters<'a> {
+    client_id: &'a str,
+    client_secret: &'a str,
+    code: &'a str,
+    grant_type: &'a str,
+    redirect_uri: &'a RedirectUri,
 }
 
 #[derive(Deserialize)]
@@ -38,16 +38,12 @@ impl AccessTokenRequest {
 
     pub(super) async fn execute(&self, code: &str) -> Result<AccessTokenResponse, AuthError> {
         let secrets = Secrets::default();
-        let client_id = secrets.google_auth.client_id().clone();
-        let client_secret = secrets.google_auth.client_secret().clone();
-        let redirect_uri = RedirectUri::new(&self.context.config);
-
         let parameters = Parameters {
-            client_id,
-            client_secret,
-            code: code.to_owned(),
-            grant_type: "authorization_code".to_owned(),
-            redirect_uri,
+            client_id: &secrets.google_auth.client_id(),
+            client_secret: &secrets.google_auth.client_secret(),
+            code,
+            grant_type: "authorization_code",
+            redirect_uri: &RedirectUri::new(&self.context.config),
         };
 
         let client = reqwest::Client::new();
