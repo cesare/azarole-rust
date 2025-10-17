@@ -22,7 +22,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", get().to(index))
         .route("", post().to(create))
-        .route("/attendance_records/{id}", delete().to(destroy));
+        .route("/{id}", delete().to(destroy));
 }
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
