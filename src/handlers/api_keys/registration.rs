@@ -66,7 +66,7 @@ impl<'a> ApiKeyRegistration<'a> {
     }
 
     async fn save(&self, digest: &str) -> Result<ApiKey, DatabaseError> {
-        let statement = "insert into api_keys (user_id, name, digest, created_at) values ($1, $2, $3, $4) returning id, name, digest";
+        let statement = "insert into api_keys (user_id, name, digest, created_at) values ($1, $2, $3, $4) returning id, user_id, name, digest, created_at";
         let now = Utc::now();
         let api_key: ApiKey = sqlx::query_as(statement)
             .bind(self.user.id)
