@@ -1,3 +1,4 @@
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
@@ -19,6 +20,7 @@ pub struct ApiKey {
     pub user_id: UserId,
     pub name: String,
     pub digest: String,
+    pub created_at: DateTime<Utc>,
 }
 
 pub struct ApiKeyResources<'a> {
@@ -32,7 +34,7 @@ impl<'a> ApiKeyResources<'a> {
     }
 
     pub async fn list(&self) -> Result<Vec<ApiKey>, DatabaseError> {
-        let api_keys: Vec<ApiKey> = sqlx::query_as("select id, name from api_keys where user_id = $1 order by created_at desc")
+        let api_keys: Vec<ApiKey> = sqlx::query_as("select id, user_id, name, digest, created_at from api_keys where user_id = $1 order by created_at desc")
             .bind(self.user.id)
             .fetch_all(&self.context.database.pool)
             .await?;

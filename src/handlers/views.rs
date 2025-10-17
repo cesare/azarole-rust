@@ -10,6 +10,7 @@ use crate::models::{
 pub(in crate::handlers) struct ApiKeyView<'a> {
     id: &'a ApiKeyId,
     name: &'a String,
+    created_at: &'a DateTime<Utc>,
 }
 
 impl<'a> ApiKeyView<'a> {
@@ -17,6 +18,7 @@ impl<'a> ApiKeyView<'a> {
         Self {
             id: &api_key.id,
             name: &api_key.name,
+            created_at: &api_key.created_at,
         }
     }
 }

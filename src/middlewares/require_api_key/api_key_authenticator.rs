@@ -46,7 +46,7 @@ impl ApiKeyAuthenticator {
     }
 
     async fn find_api_token(&self, digest: &str) -> Result<Option<ApiKey>> {
-        let result: Option<ApiKey> = sqlx::query_as("select id, user_id, name, digest from api_keys where digest = $1")
+        let result: Option<ApiKey> = sqlx::query_as("select id, user_id, name, digest, created_at from api_keys where digest = $1")
             .bind(digest)
             .fetch_optional(&self.context.database.pool)
             .await?;
