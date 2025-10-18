@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use anyhow::Result;
 use sha2::Sha256;
 use hmac::{Hmac, Mac};
@@ -9,20 +7,17 @@ use crate::models::User;
 use crate::models::ApiKey;
 use crate::secrets::Secrets;
 
-pub(super) struct ApiKeyAuthenticator {
-    context: Arc<ApplicationContext>,
-    token: String,
+pub(super) struct ApiKeyAuthenticator<'a> {
+    context: &'a ApplicationContext,
+    token: &'a str,
 }
 
-impl ApiKeyAuthenticator {
-    pub(super) fn new(context: Arc<ApplicationContext>, token: &str) -> Self {
-        Self {
-            context,
-            token: token.to_owned(),
-        }
+impl<'a> ApiKeyAuthenticator<'a> {
+    pub(super) fn new(context: &'a ApplicationContext, token: &'a str) -> Self {
+        Self { context, token }
     }
 
-    pub(super) async fn authenticate(&self) -> Result<Option<User>> {
+    pub(super) async fn authenticate(self) -> Result<Option<User>> {
         let digest = self.digest_token()?;
         match self.find_api_token(&digest).await? {
             Some(api_key) => {

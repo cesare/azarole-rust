@@ -1,5 +1,4 @@
 use std::rc::Rc;
-use std::sync::Arc;
 
 use actix_web::{Error, FromRequest, HttpMessage};
 use actix_web::body::MessageBody;
@@ -66,7 +65,7 @@ where
             let bearer_auth = BearerAuth::extract(req.request()).await?;
             let token = bearer_auth.token();
 
-            let authenticator = ApiKeyAuthenticator::new(Arc::clone(context), token);
+            let authenticator = ApiKeyAuthenticator::new(&context, token);
             let result = authenticator.authenticate().await;
             match result {
                 Ok(Some(user)) => {
