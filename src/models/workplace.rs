@@ -37,7 +37,7 @@ impl<'a> WorkplaceResources<'a> {
     }
 
     pub async fn create(&self, name: &str) -> Result<Workplace, DatabaseError> {
-        let statement = "insert into workplaces (user_id, name, created_at updated_at) values ($1, $2, $3, $4) returning id, user_id, name";
+        let statement = "insert into workplaces (user_id, name, created_at, updated_at) values ($1, $2, $3, $4) returning id, user_id, name";
         let now = Utc::now();
 
         let workplace: Workplace = sqlx::query_as(statement)
