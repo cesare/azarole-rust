@@ -1,4 +1,4 @@
-use actix_web::web::{ServiceConfig, scope};
+use actix_web::{web::{get, resource, scope, ServiceConfig}, HttpResponse};
 
 use crate::middlewares::{
     require_api_key::RequireApiKey,
@@ -19,6 +19,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
         .service(scope("/api").wrap(RequireApiKey::new()).configure(api::routes))
         .service(scope("/auth/google").configure(auth::routes))
         .service(scope("/signout").configure(signout::routes))
+        .service(resource("/ping").route(get().to(HttpResponse::Ok)))
         .service(scope("").wrap(RequireSignin::new()).configure(backend_routes));
 }
 
