@@ -48,8 +48,11 @@ impl<'a> AccessTokenRequest<'a> {
         let raw_response = client.post("https://oauth2.googleapis.com/token")
             .form(&parameters)
             .send()
-            .await?;
-        let response = raw_response.json::<AccessTokenResponse>().await?;
+            .await
+            .inspect_err(|e| log::error!("Access token request failed: {:?}", e))?;
+
+        let response = raw_response.json::<AccessTokenResponse>().await
+            .inspect_err(|e| log::error!("Failed to parse access token response: {:?}", e))?;
         Ok(response)
     }
 }
