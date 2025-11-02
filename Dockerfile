@@ -1,4 +1,4 @@
-FROM rust:1.91-bullseye AS builder
+FROM rust:1.91-trixie AS builder
 
 ARG BUILDDIR=/app
 WORKDIR ${BUILDDIR}
@@ -13,7 +13,7 @@ cargo build --locked --release
 cp ./target/release/azarole /usr/local/bin/
 EOF
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 
 RUN apt-get update && apt-get install -y ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/bin/azarole /usr/local/bin/azarole
