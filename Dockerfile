@@ -15,6 +15,6 @@ EOF
 
 FROM debian:bullseye-slim
 
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y ca-certificates openssl && rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/bin/azarole /usr/local/bin/azarole
 CMD ["azarole"]
