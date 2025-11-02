@@ -59,7 +59,8 @@ where
 
         Box::pin(async move {
             let session = req.get_session();
-            let value = session.get::<UserId>("user_id")?;
+            let value = session.get::<UserId>("user_id")
+                .inspect_err(|e| log::error!("Failed to fetch user_id from session: {:?}", e))?;
             if value.is_none() {
                 return Err(actix_web::error::ErrorUnauthorized("unauthorized"));
             }
@@ -83,7 +84,8 @@ where
                     session.remove("user_id");
                     Err(actix_web::error::ErrorUnauthorized("unauthorized"))
                 },
-                Err(_err) => {
+                Err(error) => {
+                    log::error!("Failed to fetch user: {:?}", error);
                     Err(actix_web::error::ErrorInternalServerError("internal server error"))
                 }
             }

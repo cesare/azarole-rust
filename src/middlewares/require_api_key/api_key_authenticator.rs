@@ -32,7 +32,9 @@ impl<'a> ApiKeyAuthenticator<'a> {
     fn digest_token(&self) -> Result<String> {
         let secrets = Secrets::default();
         let secret_key = secrets.api_key.digesting_secret_key();
-        let mut mac = Hmac::<Sha256>::new_from_slice(secret_key.as_bytes())?;
+        let mut mac = Hmac::<Sha256>::new_from_slice(secret_key.as_bytes())
+            .inspect_err(|e| log::error!("Failed to prepare Hmac object: {:?}", e))?;
+
         mac.update(self.token.as_bytes());
         let result = mac.finalize();
         let bytes = result.into_bytes();
@@ -44,7 +46,9 @@ impl<'a> ApiKeyAuthenticator<'a> {
         let result: Option<ApiKey> = sqlx::query_as("select id, user_id, name, digest, created_at from api_keys where digest = $1")
             .bind(digest)
             .fetch_optional(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
+
         Ok(result)
     }
 }
