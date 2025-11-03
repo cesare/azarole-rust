@@ -37,7 +37,9 @@ impl<'a> ApiKeyResources<'a> {
         let api_keys: Vec<ApiKey> = sqlx::query_as("select id, user_id, name, digest, created_at from api_keys where user_id = $1 order by created_at desc")
             .bind(self.user.id)
             .fetch_all(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
+
         Ok(api_keys)
     }
 
@@ -45,7 +47,8 @@ impl<'a> ApiKeyResources<'a> {
         sqlx::query("delete from api_keys where id = $1")
             .bind(id)
             .execute(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to delete api_key: {:?}", e))?;
         Ok(())
     }
 }

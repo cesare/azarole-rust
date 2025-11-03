@@ -32,7 +32,9 @@ impl<'a> WorkplaceResources<'a> {
         let workplaces: Vec<Workplace> = sqlx::query_as("select id, user_id, name from workplaces where user_id = $1 order by id")
             .bind(self.user.id)
             .fetch_all(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to query workplaces: {:?}", e))?;
+
         Ok(workplaces)
     }
 
@@ -46,7 +48,9 @@ impl<'a> WorkplaceResources<'a> {
             .bind(now)
             .bind(now)
             .fetch_one(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to create workplace: {:?}", e))?;
+
         Ok(workplace)
     }
 
@@ -56,7 +60,9 @@ impl<'a> WorkplaceResources<'a> {
             .bind(self.user.id)
             .bind(id)
             .fetch_one(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to find workplace: {:?}", e))?;
+
         Ok(workplace)
     }
 }

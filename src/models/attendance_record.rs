@@ -44,7 +44,9 @@ impl<'a> AttendanceRecordResources<'a> {
             .bind(datetime)
             .bind(now)
             .fetch_one(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to create attendance_record: {:?}", e))?;
+
         Ok(attendance_record)
     }
 
@@ -54,7 +56,9 @@ impl<'a> AttendanceRecordResources<'a> {
             .bind(id)
             .bind(self.workplace.id)
             .execute(&self.context.database.pool)
-            .await?;
+            .await
+            .inspect_err(|e| log::error!("Failed to delete attendance_record: {:?}", e))?;
+
         Ok(())
     }
 }
