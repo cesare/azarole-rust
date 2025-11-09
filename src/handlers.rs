@@ -19,7 +19,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
         .service(scope("/api").wrap(RequireApiKey::new()).configure(api::routes))
         .service(scope("/auth/google").configure(auth::routes))
         .service(scope("/signout").configure(signout::routes))
-        .service(resource("/ping").route(get().to(HttpResponse::Ok)))
+        .service(resource("/ping").route(get().to(HttpResponse::NoContent)))
         .service(scope("").wrap(RequireSignin::new()).configure(backend_routes));
 }
 
