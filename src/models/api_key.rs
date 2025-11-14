@@ -44,7 +44,8 @@ impl<'a> ApiKeyResources<'a> {
     }
 
     pub async fn destroy(&self, id: &ApiKeyId) -> Result<(), DatabaseError> {
-        sqlx::query("delete from api_keys where id = $1")
+        sqlx::query("delete from api_keys where user_id = $1 and id = $2")
+            .bind(self.user.id)
             .bind(id)
             .execute(&self.context.database.pool)
             .await
