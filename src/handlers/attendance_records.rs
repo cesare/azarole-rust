@@ -1,11 +1,9 @@
-use std::ops::Deref;
-
 use actix_web::{
     web::{delete, get, post, Data, Form, Path, Query, ReqData, ServiceConfig},
     HttpResponse
 };
-use chrono::{DateTime, Datelike, Local};
-use serde::{Deserialize, Serialize};
+use chrono::{DateTime, Local};
+use serde::{Deserialize};
 use serde_json::json;
 
 use crate::{
@@ -16,61 +14,13 @@ use crate::{
 use super::views::{AttendanceRecordView, WorkplaceView};
 
 mod listing;
-use listing::{TargetMonth, AttendancesForMonth};
+use listing::{TargetMonth, AttendancesForMonth, Year, Month};
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
         .route("", get().to(index))
         .route("", post().to(create))
         .route("/{id}", delete().to(destroy));
-}
-
-#[derive(Clone, Copy, Deserialize, Serialize)]
-#[repr(transparent)]
-struct Year(i32);
-
-impl Default for Year {
-    fn default() -> Self {
-        Self(Local::now().year())
-    }
-}
-
-impl From<Year> for i32 {
-    fn from(value: Year) -> Self {
-        value.0
-    }
-}
-
-impl Deref for Year {
-    type Target = i32;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-#[derive(Clone, Copy, Deserialize, Serialize)]
-#[repr(transparent)]
-struct Month(u32);
-
-impl Default for Month {
-    fn default() -> Self {
-        Self(Local::now().month())
-    }
-}
-
-impl From<Month> for u32 {
-    fn from(value: Month) -> Self {
-        value.0
-    }
-}
-
-impl Deref for Month {
-    type Target = u32;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
 }
 
 #[derive(Deserialize)]

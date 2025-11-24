@@ -1,8 +1,59 @@
-use chrono::{DateTime, Local, Months, NaiveDate, Utc};
+use std::ops::Deref;
+
+use chrono::{DateTime, Datelike, Local, Months, NaiveDate, Utc};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     context::ApplicationContext, errors::DatabaseError, models::{AttendanceRecord, Workplace}
 };
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[repr(transparent)]
+pub(super) struct Year(i32);
+
+impl Default for Year {
+    fn default() -> Self {
+        Self(Local::now().year())
+    }
+}
+
+impl From<Year> for i32 {
+    fn from(value: Year) -> Self {
+        value.0
+    }
+}
+
+impl Deref for Year {
+    type Target = i32;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+#[derive(Clone, Copy, Deserialize, Serialize)]
+#[repr(transparent)]
+pub(super) struct Month(u32);
+
+impl Default for Month {
+    fn default() -> Self {
+        Self(Local::now().month())
+    }
+}
+
+impl From<Month> for u32 {
+    fn from(value: Month) -> Self {
+        value.0
+    }
+}
+
+impl Deref for Month {
+    type Target = u32;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 pub(super) struct TargetMonth {
     pub(super) year: i32,
