@@ -1,5 +1,5 @@
-use chrono::{DateTime, Datelike, Local, Months, NaiveDate, Utc};
-use chrono_tz::Asia;
+use chrono::{DateTime, Datelike, Months, NaiveDate, Utc};
+use chrono_tz::{Asia, Tz};
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -29,11 +29,14 @@ impl From<Month> for u32 {
 pub(super) struct TargetMonth {
     pub(super) year: i32,
     pub(super) month: u32,
+
+    timezone: Tz,
 }
 
 impl TargetMonth {
     pub(super) fn new_with_default_timezone(year_opt: Option<Year>, month_opt: Option<Month>) -> Self {
-        let now = Utc::now().with_timezone(&Asia::Tokyo);
+        let timezone = Asia::Tokyo;
+        let now = Utc::now().with_timezone(&timezone);
 
         let year = year_opt.map_or(now.year(), |v| v.into());
         let month = month_opt.map_or(now.month(), |v| v.into());
@@ -44,11 +47,13 @@ impl TargetMonth {
         Self {
             year: year + y,
             month: m,
+
+            timezone
         }
     }
 
     fn datetime_range(&self) -> (DateTime<Utc>, DateTime<Utc>) {
-        let timezone = Local::now().timezone();
+        let timezone = self.timezone;
 
         let local_start_time = NaiveDate::from_ymd_opt(self.year, self.month, 1).unwrap().and_hms_opt(0, 0, 0).unwrap().and_local_timezone(timezone).unwrap();
         let local_end_time = local_start_time.checked_add_months(Months::new(1)).unwrap();
