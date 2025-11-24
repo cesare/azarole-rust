@@ -1,6 +1,5 @@
-use std::ops::Deref;
-
 use chrono::{DateTime, Datelike, Local, Months, NaiveDate, Utc};
+use chrono_tz::Asia;
 use serde::{Deserialize, Serialize};
 
 use crate::{
@@ -11,23 +10,9 @@ use crate::{
 #[repr(transparent)]
 pub(super) struct Year(i32);
 
-impl Default for Year {
-    fn default() -> Self {
-        Self(Local::now().year())
-    }
-}
-
 impl From<Year> for i32 {
     fn from(value: Year) -> Self {
         value.0
-    }
-}
-
-impl Deref for Year {
-    type Target = i32;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -35,23 +20,9 @@ impl Deref for Year {
 #[repr(transparent)]
 pub(super) struct Month(u32);
 
-impl Default for Month {
-    fn default() -> Self {
-        Self(Local::now().month())
-    }
-}
-
 impl From<Month> for u32 {
     fn from(value: Month) -> Self {
         value.0
-    }
-}
-
-impl Deref for Month {
-    type Target = u32;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
     }
 }
 
@@ -61,9 +32,15 @@ pub(super) struct TargetMonth {
 }
 
 impl TargetMonth {
-    pub(super) fn new(year: &i32, month: &u32) -> Self {
+    pub(super) fn new_with_default_timezone(year_opt: Option<Year>, month_opt: Option<Month>) -> Self {
+        let now = Utc::now().with_timezone(&Asia::Tokyo);
+
+        let year = year_opt.map_or(now.year(), |v| v.into());
+        let month = month_opt.map_or(now.month(), |v| v.into());
+
         let m = month % 12;
         let y: i32 = (month / 12).try_into().unwrap();
+
         Self {
             year: year + y,
             month: m,

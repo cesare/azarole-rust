@@ -30,16 +30,14 @@ struct PathInfo {
 
 #[derive(Deserialize)]
 struct IndexParameters {
-    #[serde(default)]
-    year: Year,
-    #[serde(default)]
-    month: Month,
+    year: Option<Year>,
+    month: Option<Month>,
 }
 
 async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, params: Query<IndexParameters>) -> Result<HttpResponse, PerRequestError> {
     let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
 
-    let target_month = TargetMonth::new(&params.year, &params.month);
+    let target_month = TargetMonth::new_with_default_timezone(params.year, params.month);
     let finder = AttendancesForMonth::new(&context, &workplace, &target_month);
     let attendance_records = finder.execute().await?;
 
