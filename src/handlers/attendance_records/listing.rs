@@ -41,12 +41,9 @@ impl TargetMonth {
         let year = year_opt.unwrap_or(now.year());
         let month = month_opt.unwrap_or(now.month());
 
-        let m = month % 12;
-        let y: i32 = (month / 12).try_into().unwrap();
-
         Self {
-            year: Year(year + y),
-            month: Month(m),
+            year: Year(year),
+            month: Month(month),
 
             timezone
         }
