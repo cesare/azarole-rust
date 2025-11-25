@@ -5,6 +5,7 @@ use actix_web::{
 use chrono::{DateTime, Local};
 use serde::{Deserialize};
 use serde_json::json;
+use validator::Validate;
 
 use crate::{
     context::ApplicationContext, errors::PerRequestError, models::{
@@ -28,9 +29,11 @@ struct PathInfo {
     workplace_id: WorkplaceId,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Validate)]
 struct IndexParameters {
+    #[validate(range(min = 0))]
     year: Option<i32>,
+    #[validate(range(min = 1, max = 12))]
     month: Option<u32>,
 }
 
