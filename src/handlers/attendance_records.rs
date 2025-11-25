@@ -14,7 +14,7 @@ use crate::{
 use super::views::{AttendanceRecordView, WorkplaceView};
 
 mod listing;
-use listing::{TargetMonth, AttendancesForMonth, Year, Month};
+use listing::{TargetMonth, AttendancesForMonth};
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
@@ -30,8 +30,8 @@ struct PathInfo {
 
 #[derive(Deserialize)]
 struct IndexParameters {
-    year: Option<Year>,
-    month: Option<Month>,
+    year: Option<i32>,
+    month: Option<u32>,
 }
 
 async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, params: Query<IndexParameters>) -> Result<HttpResponse, PerRequestError> {

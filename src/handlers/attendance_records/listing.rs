@@ -27,26 +27,26 @@ impl From<Month> for u32 {
 }
 
 pub(super) struct TargetMonth {
-    pub(super) year: i32,
-    pub(super) month: u32,
+    pub(super) year: Year,
+    pub(super) month: Month,
 
     timezone: Tz,
 }
 
 impl TargetMonth {
-    pub(super) fn new_with_default_timezone(year_opt: Option<Year>, month_opt: Option<Month>) -> Self {
+    pub(super) fn new_with_default_timezone(year_opt: Option<i32>, month_opt: Option<u32>) -> Self {
         let timezone = Asia::Tokyo;
         let now = Utc::now().with_timezone(&timezone);
 
-        let year = year_opt.map_or(now.year(), |v| v.into());
-        let month = month_opt.map_or(now.month(), |v| v.into());
+        let year = year_opt.unwrap_or(now.year());
+        let month = month_opt.unwrap_or(now.month());
 
         let m = month % 12;
         let y: i32 = (month / 12).try_into().unwrap();
 
         Self {
-            year: year + y,
-            month: m,
+            year: Year(year + y),
+            month: Month(m),
 
             timezone
         }
@@ -55,7 +55,7 @@ impl TargetMonth {
     fn datetime_range(&self) -> (DateTime<Utc>, DateTime<Utc>) {
         let timezone = self.timezone;
 
-        let local_start_time = NaiveDate::from_ymd_opt(self.year, self.month, 1).unwrap().and_hms_opt(0, 0, 0).unwrap().and_local_timezone(timezone).unwrap();
+        let local_start_time = NaiveDate::from_ymd_opt(self.year.into(), self.month.into(), 1).unwrap().and_hms_opt(0, 0, 0).unwrap().and_local_timezone(timezone).unwrap();
         let local_end_time = local_start_time.checked_add_months(Months::new(1)).unwrap();
 
         let utc_start_time = local_start_time.to_utc();
