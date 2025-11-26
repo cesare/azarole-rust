@@ -7,8 +7,7 @@ use rand::{
 use url::Url;
 
 use crate::{
-    config::ApplicationConfig,
-    secrets::Secrets,
+    context::ApplicationContext
 };
 use super::RedirectUri;
 
@@ -19,12 +18,12 @@ pub(super) struct AuthenticationRequest {
 }
 
 pub(super) struct AuthenticationRequestGenerator<'a> {
-    config: &'a ApplicationConfig,
+    context: &'a ApplicationContext,
 }
 
 impl<'a> AuthenticationRequestGenerator<'a> {
-    pub(super) fn new(config: &'a ApplicationConfig) -> Self {
-        Self { config }
+    pub(super) fn new(context: &'a ApplicationContext) -> Self {
+        Self { context }
     }
 
     pub(super) fn generate(&self) -> AuthenticationRequest {
@@ -36,10 +35,9 @@ impl<'a> AuthenticationRequestGenerator<'a> {
     }
 
     fn build_request_url(&self, state: &str, nonce: &str) -> String {
-        let secrets = Secrets::default();
         let parameters: &[(&str, &str)] = &[
-            ("client_id", &secrets.google_auth.client_id()),
-            ("redirect_uri", &RedirectUri::new(self.config)),
+            ("client_id", &self.context.secrets.google_auth.client_id()),
+            ("redirect_uri", &RedirectUri::new(&self.context.config)),
             ("response_type", "code"),
             ("scope", "openid email"),
             ("state", state),

@@ -29,7 +29,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn request_authentication(context: Data<ApplicationContext>, session: Session) -> Result<HttpResponse, PerRequestError> {
-    let generator = AuthenticationRequestGenerator::new(&context.config);
+    let generator = AuthenticationRequestGenerator::new(&context);
     let authentication_request = generator.generate();
 
     session.insert("google-auth-state", &authentication_request.state)?;
