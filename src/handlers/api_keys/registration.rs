@@ -13,7 +13,6 @@ use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
     models::{ApiKey, ApiKeyId, User},
-    secrets::Secrets,
 };
 
 pub(super) struct ApiKeyRegistration<'a> {
@@ -56,8 +55,7 @@ impl<'a> ApiKeyRegistration<'a> {
     }
 
     fn digest_token(&self, token: &str) -> String {
-        let secrets = Secrets::default();
-        let secret_key = secrets.api_key.digesting_secret_key();
+        let secret_key = self.context.secrets.api_key.digesting_secret_key();
         let mut mac = Hmac::<Sha256>::new_from_slice(secret_key.as_bytes()).unwrap();
         mac.update(token.as_bytes());
         let result = mac.finalize();

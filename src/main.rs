@@ -18,7 +18,6 @@ mod secrets;
 
 use self::config::ApplicationConfig;
 use self::context::ApplicationContext;
-use self::secrets::Secrets;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
     Cors::default()
@@ -28,8 +27,8 @@ fn build_cors(config: &ApplicationConfig) -> Cors {
         .supports_credentials()
 }
 
-fn build_session_middleware() -> SessionMiddleware<CookieSessionStore> {
-    let session_key = Secrets::default().session.session_key();
+fn build_session_middleware(context: &ApplicationContext) -> SessionMiddleware<CookieSessionStore> {
+    let session_key = context.secrets.session.session_key();
     SessionMiddleware::new(CookieSessionStore::default(), Key::from(&session_key))
 }
 
@@ -46,7 +45,7 @@ async fn main() -> anyhow::Result<()> {
         App::new()
             .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
             .wrap(build_cors(&config))
-            .wrap(build_session_middleware())
+            .wrap(build_session_middleware(&context))
             .app_data(Data::new(context.clone()))
             .configure(handlers::routes)
     });

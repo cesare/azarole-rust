@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     context::ApplicationContext,
-    secrets::Secrets,
 };
 use super::{AuthError, RedirectUri};
 
@@ -35,10 +34,9 @@ impl<'a> AccessTokenRequest<'a> {
     }
 
     pub(super) async fn execute(&self, code: &str) -> Result<AccessTokenResponse, AuthError> {
-        let secrets = Secrets::default();
         let parameters = Parameters {
-            client_id: &secrets.google_auth.client_id(),
-            client_secret: &secrets.google_auth.client_secret(),
+            client_id: &self.context.secrets.google_auth.client_id(),
+            client_secret: &self.context.secrets.google_auth.client_secret(),
             code,
             grant_type: "authorization_code",
             redirect_uri: &RedirectUri::new(&self.context.config),
