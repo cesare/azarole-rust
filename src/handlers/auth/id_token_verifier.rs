@@ -3,7 +3,7 @@ use jsonwebtoken::{
 };
 use serde::Deserialize;
 
-use crate::secrets::Secrets;
+use crate::{context::ApplicationContext};
 
 use super::AuthError;
 
@@ -18,13 +18,14 @@ pub(super) struct Claims {
 }
 
 pub(super) struct IdTokenVerifier<'a> {
+    context: &'a ApplicationContext,
     token: &'a str,
     nonce: &'a str,
 }
 
 impl<'a> IdTokenVerifier<'a> {
-    pub(super) fn new(token: &'a str, nonce: &'a str) -> Self {
-        Self { token, nonce }
+    pub(super) fn new(context: &'a ApplicationContext, token: &'a str, nonce: &'a str) -> Self {
+        Self { context, token, nonce }
     }
 
     pub(super) async fn verify(self) -> Result<Claims, AuthError> {
@@ -67,8 +68,7 @@ impl<'a> IdTokenVerifier<'a> {
         let decoding_key = DecodingKey::from_jwk(jwk)
             .inspect_err(|e| log::error!("Failed to detect decoding key from jwk: {:?}", e))?;
 
-        let secrets = Secrets::default();
-        let client_id = secrets.google_auth.client_id();
+        let client_id = self.context.secrets.google_auth.client_id();
 
         let mut validation = Validation::new(Algorithm::RS256);
         validation.set_audience(&[client_id]);

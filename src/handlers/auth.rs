@@ -71,7 +71,7 @@ async fn handle_success(context: Data<ApplicationContext>, session: Session, cod
     let access_token_request = AccessTokenRequest::new(&context);
     let access_token_response = access_token_request.execute(&code).await?;
 
-    let id_token_verifier = IdTokenVerifier::new(&access_token_response.id_token, &saved_nonce);
+    let id_token_verifier = IdTokenVerifier::new(&context, &access_token_response.id_token, &saved_nonce);
     let claims = id_token_verifier.verify().await?;
 
     let finder = UserFinder::new(&context, &claims.sub);
