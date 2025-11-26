@@ -57,14 +57,9 @@ impl GoogleAuthConfig {
     }
 }
 
-#[derive(Clone)]
-pub struct SessionConfig;
-
-impl SessionConfig {
-    pub fn session_key(&self) -> Vec<u8> {
-        let base64_value = env::var("SESSION_KEY").unwrap();
-        STANDARD.decode(base64_value).unwrap()
-    }
+#[derive(Clone, Deserialize)]
+pub struct SessionConfig {
+    pub session_key: Base64Encoded,
 }
 
 #[derive(Clone)]
@@ -76,10 +71,12 @@ pub struct Secrets {
 
 impl Secrets {
     pub fn load() -> Result<Self> {
+        let session = envy::from_env::<SessionConfig>()?;
+
         let secrets = Self {
             api_key: ApikeyConfig,
             google_auth: GoogleAuthConfig,
-            session: SessionConfig,
+            session,
         };
         Ok(secrets)
     }

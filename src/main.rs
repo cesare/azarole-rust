@@ -28,8 +28,7 @@ fn build_cors(config: &ApplicationConfig) -> Cors {
 }
 
 fn build_session_middleware(context: &ApplicationContext) -> SessionMiddleware<CookieSessionStore> {
-    let session_key = context.secrets.session.session_key();
-    SessionMiddleware::new(CookieSessionStore::default(), Key::from(&session_key))
+    SessionMiddleware::new(CookieSessionStore::default(), Key::from(&context.secrets.session.session_key))
 }
 
 #[actix_rt::main]
