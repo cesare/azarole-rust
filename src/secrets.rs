@@ -1,4 +1,4 @@
-use std::{env, ops::Deref};
+use std::ops::Deref;
 use anyhow::Result;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use serde::{de, Deserialize};
@@ -35,13 +35,10 @@ impl<'de> de::Visitor<'de> for Base64EncodedVisitor {
     }
 }
 
-#[derive(Clone)]
-pub struct ApikeyConfig;
-
-impl ApikeyConfig {
-    pub fn digesting_secret_key(&self) -> String {
-        env::var("API_KEY_DIGESTING_SECRET_KEY").unwrap()
-    }
+#[derive(Clone, Deserialize)]
+pub struct ApikeyConfig {
+    #[serde(rename = "api_key_digesting_secret_key")]
+    pub digesting_secret_key: String,
 }
 
 #[derive(Clone, Deserialize)]
@@ -67,11 +64,12 @@ pub struct Secrets {
 
 impl Secrets {
     pub fn load() -> Result<Self> {
+        let api_key = envy::from_env::<ApikeyConfig>()?;
         let google_auth = envy::from_env::<GoogleAuthConfig>()?;
         let session = envy::from_env::<SessionConfig>()?;
 
         let secrets = Self {
-            api_key: ApikeyConfig,
+            api_key,
             google_auth,
             session,
         };
