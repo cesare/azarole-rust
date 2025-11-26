@@ -1,10 +1,18 @@
-use std::env;
+use std::{env, ops::Deref};
 use anyhow::Result;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 use serde::{de, Deserialize};
 
 #[derive(Clone)]
-struct Base64Encoded(Vec<u8>);
+pub struct Base64Encoded(Vec<u8>);
+
+impl Deref for Base64Encoded {
+    type Target = Vec<u8>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl<'de> Deserialize<'de> for Base64Encoded {
     fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
@@ -27,7 +35,7 @@ impl<'de> de::Visitor<'de> for Base64EncodedVisitor {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct ApikeyConfig;
 
 impl ApikeyConfig {
@@ -36,7 +44,7 @@ impl ApikeyConfig {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct GoogleAuthConfig;
 
 impl GoogleAuthConfig {
@@ -49,7 +57,7 @@ impl GoogleAuthConfig {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct SessionConfig;
 
 impl SessionConfig {
@@ -59,7 +67,7 @@ impl SessionConfig {
     }
 }
 
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Secrets {
     pub api_key: ApikeyConfig,
     pub google_auth: GoogleAuthConfig,
@@ -68,6 +76,11 @@ pub struct Secrets {
 
 impl Secrets {
     pub fn load() -> Result<Self> {
-        Ok(Self::default())
+        let secrets = Self {
+            api_key: ApikeyConfig,
+            google_auth: GoogleAuthConfig,
+            session: SessionConfig,
+        };
+        Ok(secrets)
     }
 }
