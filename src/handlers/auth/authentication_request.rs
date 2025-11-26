@@ -36,7 +36,7 @@ impl<'a> AuthenticationRequestGenerator<'a> {
 
     fn build_request_url(&self, state: &str, nonce: &str) -> String {
         let parameters: &[(&str, &str)] = &[
-            ("client_id", &self.context.secrets.google_auth.client_id()),
+            ("client_id", &self.context.secrets.google_auth.client_id),
             ("redirect_uri", &RedirectUri::new(&self.context.config)),
             ("response_type", "code"),
             ("scope", "openid email"),

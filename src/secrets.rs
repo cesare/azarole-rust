@@ -44,17 +44,13 @@ impl ApikeyConfig {
     }
 }
 
-#[derive(Clone)]
-pub struct GoogleAuthConfig;
+#[derive(Clone, Deserialize)]
+pub struct GoogleAuthConfig {
+    #[serde(rename = "google_auth_client_id")]
+    pub client_id: String,
 
-impl GoogleAuthConfig {
-    pub fn client_id(&self) -> String {
-        env::var("GOOGLE_AUTH_CLIENT_ID").unwrap()
-    }
-
-    pub fn client_secret(&self) -> String {
-        env::var("GOOGLE_AUTH_CLIENT_SECRET").unwrap()
-    }
+    #[serde(rename = "google_auth_client_secret")]
+    pub client_secret: String,
 }
 
 #[derive(Clone, Deserialize)]
@@ -71,11 +67,12 @@ pub struct Secrets {
 
 impl Secrets {
     pub fn load() -> Result<Self> {
+        let google_auth = envy::from_env::<GoogleAuthConfig>()?;
         let session = envy::from_env::<SessionConfig>()?;
 
         let secrets = Self {
             api_key: ApikeyConfig,
-            google_auth: GoogleAuthConfig,
+            google_auth,
             session,
         };
         Ok(secrets)

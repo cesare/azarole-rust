@@ -68,7 +68,7 @@ impl<'a> IdTokenVerifier<'a> {
         let decoding_key = DecodingKey::from_jwk(jwk)
             .inspect_err(|e| log::error!("Failed to detect decoding key from jwk: {:?}", e))?;
 
-        let client_id = self.context.secrets.google_auth.client_id();
+        let client_id = &self.context.secrets.google_auth.client_id;
 
         let mut validation = Validation::new(Algorithm::RS256);
         validation.set_audience(&[client_id]);

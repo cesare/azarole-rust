@@ -35,8 +35,8 @@ impl<'a> AccessTokenRequest<'a> {
 
     pub(super) async fn execute(&self, code: &str) -> Result<AccessTokenResponse, AuthError> {
         let parameters = Parameters {
-            client_id: &self.context.secrets.google_auth.client_id(),
-            client_secret: &self.context.secrets.google_auth.client_secret(),
+            client_id: &self.context.secrets.google_auth.client_id,
+            client_secret: &self.context.secrets.google_auth.client_secret,
             code,
             grant_type: "authorization_code",
             redirect_uri: &RedirectUri::new(&self.context.config),
