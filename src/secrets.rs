@@ -1,7 +1,8 @@
 use std::env;
+use anyhow::Result;
 use base64::{engine::general_purpose::STANDARD, Engine as _};
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct ApikeyConfig;
 
 impl ApikeyConfig {
@@ -10,7 +11,7 @@ impl ApikeyConfig {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct GoogleAuthConfig;
 
 impl GoogleAuthConfig {
@@ -23,7 +24,7 @@ impl GoogleAuthConfig {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct SessionConfig;
 
 impl SessionConfig {
@@ -33,9 +34,15 @@ impl SessionConfig {
     }
 }
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Secrets {
     pub api_key: ApikeyConfig,
     pub google_auth: GoogleAuthConfig,
     pub session: SessionConfig,
+}
+
+impl Secrets {
+    pub fn load() -> Result<Self> {
+        Ok(Self::default())
+    }
 }

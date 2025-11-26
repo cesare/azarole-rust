@@ -1,7 +1,7 @@
 use anyhow::Result;
 use sqlx::{sqlite::SqlitePoolOptions, Pool, Sqlite};
 
-use crate::config::ApplicationConfig;
+use crate::{config::ApplicationConfig, secrets::Secrets};
 
 #[derive(Clone)]
 pub struct DatabaseContext {
@@ -20,13 +20,16 @@ impl DatabaseContext {
 pub struct ApplicationContext {
     pub config: ApplicationConfig,
     pub database: DatabaseContext,
+    pub secrets: Secrets,
 }
 
 impl ApplicationContext {
     pub fn new(config: &ApplicationConfig) -> Result<Self> {
         let database = DatabaseContext::new(config)?;
+        let secrets = Secrets::load()?;
         let context = Self {
             config: config.clone(),
+            secrets,
             database
         };
         Ok(context)
