@@ -26,8 +26,9 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>) -
     let resources = ApiKeyResources::new(&context, &current_user);
     let api_keys = resources.list().await?;
 
+    let api_key_views = api_keys.iter().map(ApiKeyView::new).collect::<Vec<ApiKeyView>>();
     let response_json = json!({
-        "api_keys": api_keys.iter().map(ApiKeyView::new).collect::<Vec<ApiKeyView>>(),
+        "api_keys":  api_key_views,
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)
