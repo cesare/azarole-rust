@@ -29,8 +29,7 @@ impl<'a> ApiKeyAuthenticator<'a> {
     }
 
     fn digest_token(&self) -> Result<String> {
-        let secret_key = &self.context.secrets.api_key.digesting_secret_key;
-        let mut mac = Hmac::<Sha256>::new_from_slice(secret_key.as_bytes())
+        let mut mac = Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key)
             .inspect_err(|e| log::error!("Failed to prepare Hmac object: {:?}", e))?;
 
         mac.update(self.token.as_bytes());

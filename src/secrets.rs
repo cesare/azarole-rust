@@ -38,7 +38,7 @@ impl<'de> de::Visitor<'de> for Base64EncodedVisitor {
 #[derive(Clone, Deserialize)]
 pub struct ApikeyConfig {
     #[serde(rename = "api_key_digesting_secret_key")]
-    pub digesting_secret_key: String,
+    pub digesting_secret_key: Base64Encoded,
 }
 
 #[derive(Clone, Deserialize)]
