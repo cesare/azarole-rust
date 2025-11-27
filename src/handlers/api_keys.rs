@@ -29,6 +29,7 @@ async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>) -
     let api_key_views = api_keys.iter().map(ApiKeyView::new).collect::<Vec<ApiKeyView>>();
     let response_json = json!({
         "api_keys":  api_key_views,
+        "apiKeys":  api_key_views,
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)
@@ -45,6 +46,7 @@ async fn create(context: Data<ApplicationContext>, current_user: ReqData<User>, 
 
     let response_json = json!({
         "api_key": registration_details,
+        "apiKey": registration_details,
     });
     let response = HttpResponse::Ok().json(response_json);
     Ok(response)
