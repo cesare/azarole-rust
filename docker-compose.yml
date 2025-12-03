@@ -1,0 +1,18 @@
+services:
+  azarole:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: azarole-rust
+    volumes:
+      - ./docker/dev:/app
+    environment:
+        - API_KEY_DIGESTING_SECRET_KEY
+        - GOOGLE_AUTH_CLIENT_ID
+        - GOOGLE_AUTH_CLIENT_SECRET
+        - SESSION_KEY
+        - RUST_LOG
+    ports:
+      - "3000:3000"
+    command: ["azarole", "--config-file", "/app/azarole-config.toml"]
+    restart: always
