@@ -9,7 +9,8 @@ use super::views::ApiKeyView;
 use crate::{
     context::ApplicationContext,
     errors::PerRequestError,
-    models::{ApiKeyId, ApiKeyResources, User},
+    models::{ApiKeyId, User},
+    repositories::RepositoryFactory,
 };
 
 mod registration;
@@ -26,8 +27,8 @@ async fn index(
     context: Data<ApplicationContext>,
     current_user: ReqData<User>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let resources = ApiKeyResources::new(&context, &current_user);
-    let api_keys = resources.list().await?;
+    let repository = context.repositories.api_key();
+    let api_keys = repository.list(&current_user).await?;
 
     let api_key_views = api_keys
         .iter()
@@ -72,8 +73,8 @@ async fn destroy(
     current_user: ReqData<User>,
     path: Path<ApiKeyPath>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let resources = ApiKeyResources::new(&context, &current_user);
-    resources.destroy(&path.id).await?;
+    let repository = context.repositories.api_key();
+    repository.destroy(&current_user, &path.id).await?;
 
     let response = HttpResponse::Ok().finish();
     Ok(response)

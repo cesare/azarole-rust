@@ -2,11 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
-use crate::{
-    context::ApplicationContext,
-    errors::DatabaseError,
-    models::user::{User, UserId},
-};
+use crate::models::user::UserId;
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
@@ -21,35 +17,4 @@ pub struct ApiKey {
     pub name: String,
     pub digest: String,
     pub created_at: DateTime<Utc>,
-}
-
-pub struct ApiKeyResources<'a> {
-    context: &'a ApplicationContext,
-    user: &'a User,
-}
-
-impl<'a> ApiKeyResources<'a> {
-    pub fn new(context: &'a ApplicationContext, user: &'a User) -> Self {
-        Self { context, user }
-    }
-
-    pub async fn list(&self) -> Result<Vec<ApiKey>, DatabaseError> {
-        let api_keys: Vec<ApiKey> = sqlx::query_as("select id, user_id, name, digest, created_at from api_keys where user_id = $1 order by created_at desc")
-            .bind(self.user.id)
-            .fetch_all(&self.context.database.pool)
-            .await
-            .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
-
-        Ok(api_keys)
-    }
-
-    pub async fn destroy(&self, id: &ApiKeyId) -> Result<(), DatabaseError> {
-        sqlx::query("delete from api_keys where user_id = $1 and id = $2")
-            .bind(self.user.id)
-            .bind(id)
-            .execute(&self.context.database.pool)
-            .await
-            .inspect_err(|e| log::error!("Failed to delete api_key: {:?}", e))?;
-        Ok(())
-    }
 }
