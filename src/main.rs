@@ -19,7 +19,10 @@ fn build_cors(config: &ApplicationConfig) -> Cors {
 }
 
 fn build_session_middleware(context: &ApplicationContext) -> SessionMiddleware<CookieSessionStore> {
-    SessionMiddleware::new(CookieSessionStore::default(), Key::from(&context.secrets.session.session_key))
+    SessionMiddleware::new(
+        CookieSessionStore::default(),
+        Key::from(&context.secrets.session.session_key),
+    )
 }
 
 #[actix_rt::main]
@@ -33,12 +36,17 @@ async fn main() -> anyhow::Result<()> {
 
     let server = HttpServer::new(move || {
         App::new()
-            .wrap(Logger::new("%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T"))
+            .wrap(Logger::new(
+                "%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T",
+            ))
             .wrap(build_cors(&config))
             .wrap(build_session_middleware(&context))
             .app_data(Data::new(context.clone()))
             .configure(azarole::handlers::routes)
     });
-    server.bind((server_config.bind, server_config.port))?.run().await?;
+    server
+        .bind((server_config.bind, server_config.port))?
+        .run()
+        .await?;
     Ok(())
 }

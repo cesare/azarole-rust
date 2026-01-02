@@ -5,12 +5,7 @@ use chrono::Utc;
 use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
-    models::{
-        AttendanceRecord,
-        attendance_record::Event,
-        User,
-        WorkplaceId,
-    }
+    models::{AttendanceRecord, User, WorkplaceId, attendance_record::Event},
 };
 
 pub(super) struct AttendanceRegistration {
@@ -22,24 +17,39 @@ impl AttendanceRegistration {
         Self { context }
     }
 
-    pub(super) async fn execute(&self, user: &User, workplace_id: WorkplaceId, event: Event) -> Result<AttendanceRecord, DatabaseError> {
+    pub(super) async fn execute(
+        &self,
+        user: &User,
+        workplace_id: WorkplaceId,
+        event: Event,
+    ) -> Result<AttendanceRecord, DatabaseError> {
         self.ensure_workplace(user, workplace_id).await?;
         self.create_attendance(workplace_id, event).await
     }
 
-    async fn ensure_workplace(&self, user: &User, workplace_id: WorkplaceId) -> Result<(), DatabaseError> {
-        let result = sqlx::query_as::<sqlx::Sqlite, (u32,)>("select 1 from workplaces where user_id = $1 and id = $2")
-            .bind(user.id)
-            .bind(workplace_id)
-            .fetch_one(&self.context.database.pool)
-            .await;
+    async fn ensure_workplace(
+        &self,
+        user: &User,
+        workplace_id: WorkplaceId,
+    ) -> Result<(), DatabaseError> {
+        let result = sqlx::query_as::<sqlx::Sqlite, (u32,)>(
+            "select 1 from workplaces where user_id = $1 and id = $2",
+        )
+        .bind(user.id)
+        .bind(workplace_id)
+        .fetch_one(&self.context.database.pool)
+        .await;
         match result {
             Ok(_) => Ok(()),
             Err(error) => Err(error.into()),
         }
     }
 
-    async fn create_attendance(&self, workplace_id: WorkplaceId, event: Event) -> Result<AttendanceRecord, DatabaseError> {
+    async fn create_attendance(
+        &self,
+        workplace_id: WorkplaceId,
+        event: Event,
+    ) -> Result<AttendanceRecord, DatabaseError> {
         let now = Utc::now();
         let statement = "insert into attendance_records (workplace_id, event, recorded_at, created_at) values($1, $2, $3, $4) returning id, workplace_id, event, recorded_at";
         let result = sqlx::query_as::<sqlx::Sqlite, AttendanceRecord>(statement)

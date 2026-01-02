@@ -1,11 +1,7 @@
-use base64::{engine::general_purpose::URL_SAFE, Engine};
+use base64::{Engine, engine::general_purpose::URL_SAFE};
 use chrono::Utc;
 use hmac::{Hmac, Mac};
-use rand::{
-    Rng as _,
-    SeedableRng as _,
-    rngs::StdRng
-};
+use rand::{Rng as _, SeedableRng as _, rngs::StdRng};
 use serde::Serialize;
 use sha2::Sha256;
 
@@ -30,7 +26,11 @@ pub(super) struct RegistationDetails {
 
 impl<'a> ApiKeyRegistration<'a> {
     pub(super) fn new(context: &'a ApplicationContext, user: &'a User, name: &'a str) -> Self {
-        Self { context, user, name }
+        Self {
+            context,
+            user,
+            name,
+        }
     }
 
     pub(super) async fn execute(self) -> Result<RegistationDetails, DatabaseError> {
@@ -55,7 +55,9 @@ impl<'a> ApiKeyRegistration<'a> {
     }
 
     fn digest_token(&self, token: &str) -> String {
-        let mut mac = Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key).unwrap();
+        let mut mac =
+            Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key)
+                .unwrap();
         mac.update(token.as_bytes());
         let result = mac.finalize();
         let bytes = result.into_bytes();

@@ -1,5 +1,5 @@
 use anyhow::Result;
-use sqlx::{sqlite::SqlitePoolOptions, Pool, Sqlite};
+use sqlx::{Pool, Sqlite, sqlite::SqlitePoolOptions};
 
 use crate::{config::ApplicationConfig, secrets::Secrets};
 
@@ -30,7 +30,7 @@ impl ApplicationContext {
         let context = Self {
             config: config.clone(),
             secrets,
-            database
+            database,
         };
         Ok(context)
     }

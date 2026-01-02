@@ -1,10 +1,10 @@
 use anyhow::Result;
-use sha2::Sha256;
 use hmac::{Hmac, Mac};
+use sha2::Sha256;
 
 use crate::context::ApplicationContext;
-use crate::models::User;
 use crate::models::ApiKey;
+use crate::models::User;
 
 pub(super) struct ApiKeyAuthenticator<'a> {
     context: &'a ApplicationContext,
@@ -19,18 +19,15 @@ impl<'a> ApiKeyAuthenticator<'a> {
     pub(super) async fn authenticate(self) -> Result<Option<User>> {
         let digest = self.digest_token()?;
         match self.find_api_token(&digest).await? {
-            Some(api_key) => {
-                Ok(Some(User::new(api_key.user_id)))
-            },
-            _ => {
-                Ok(None)
-            }
+            Some(api_key) => Ok(Some(User::new(api_key.user_id))),
+            _ => Ok(None),
         }
     }
 
     fn digest_token(&self) -> Result<String> {
-        let mut mac = Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key)
-            .inspect_err(|e| log::error!("Failed to prepare Hmac object: {:?}", e))?;
+        let mut mac =
+            Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key)
+                .inspect_err(|e| log::error!("Failed to prepare Hmac object: {:?}", e))?;
 
         mac.update(self.token.as_bytes());
         let result = mac.finalize();
@@ -40,11 +37,13 @@ impl<'a> ApiKeyAuthenticator<'a> {
     }
 
     async fn find_api_token(&self, digest: &str) -> Result<Option<ApiKey>> {
-        let result: Option<ApiKey> = sqlx::query_as("select id, user_id, name, digest, created_at from api_keys where digest = $1")
-            .bind(digest)
-            .fetch_optional(&self.context.database.pool)
-            .await
-            .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
+        let result: Option<ApiKey> = sqlx::query_as(
+            "select id, user_id, name, digest, created_at from api_keys where digest = $1",
+        )
+        .bind(digest)
+        .fetch_optional(&self.context.database.pool)
+        .await
+        .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
 
         Ok(result)
     }

@@ -1,13 +1,13 @@
 use actix_session::Session;
 use actix_web::{
-    web::{delete, ServiceConfig}, HttpResponse
+    HttpResponse,
+    web::{ServiceConfig, delete},
 };
 
 use crate::errors::PerRequestError;
 
 pub(super) fn routes(config: &mut ServiceConfig) {
-    config
-        .route("", delete().to(signout));
+    config.route("", delete().to(signout));
 }
 
 async fn signout(session: Session) -> Result<HttpResponse, PerRequestError> {

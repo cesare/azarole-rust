@@ -1,15 +1,9 @@
-use base64::{engine::general_purpose::URL_SAFE, Engine};
-use rand::{
-    Rng as _,
-    SeedableRng as _,
-    rngs::StdRng
-};
+use base64::{Engine, engine::general_purpose::URL_SAFE};
+use rand::{Rng as _, SeedableRng as _, rngs::StdRng};
 use url::Url;
 
-use crate::{
-    context::ApplicationContext
-};
 use super::RedirectUri;
+use crate::context::ApplicationContext;
 
 pub(super) struct AuthenticationRequest {
     pub(super) state: String,
@@ -31,7 +25,11 @@ impl<'a> AuthenticationRequestGenerator<'a> {
         let nonce = self.generate_random_string();
         let request_url = self.build_request_url(&state, &nonce);
 
-        AuthenticationRequest { state, nonce, request_url }
+        AuthenticationRequest {
+            state,
+            nonce,
+            request_url,
+        }
     }
 
     fn build_request_url(&self, state: &str, nonce: &str) -> String {
@@ -43,7 +41,9 @@ impl<'a> AuthenticationRequestGenerator<'a> {
             ("state", state),
             ("nonce", nonce),
         ];
-        Url::parse_with_params("https://accounts.google.com/o/oauth2/v2/auth", parameters).unwrap().into()
+        Url::parse_with_params("https://accounts.google.com/o/oauth2/v2/auth", parameters)
+            .unwrap()
+            .into()
     }
 
     fn generate_random_string(&self) -> String {

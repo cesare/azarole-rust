@@ -1,17 +1,14 @@
 use actix_web::{
-    web::{get, ReqData, ServiceConfig}, HttpResponse
+    HttpResponse,
+    web::{ReqData, ServiceConfig, get},
 };
 use serde_json::json;
 
-use crate::{
-    errors::PerRequestError,
-    models::User,
-};
 use super::views::UserView;
+use crate::{errors::PerRequestError, models::User};
 
 pub(super) fn routes(config: &mut ServiceConfig) {
-    config
-        .route("", get().to(current_user));
+    config.route("", get().to(current_user));
 }
 
 async fn current_user(user: ReqData<User>) -> Result<HttpResponse, PerRequestError> {

@@ -1,11 +1,11 @@
 use std::rc::Rc;
 
-use actix_web::{Error, FromRequest, HttpMessage};
 use actix_web::body::MessageBody;
 use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::web::Data;
+use actix_web::{Error, FromRequest, HttpMessage};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
-use futures_util::future::{ok, LocalBoxFuture, Ready};
+use futures_util::future::{LocalBoxFuture, Ready, ok};
 
 mod api_key_authenticator;
 
@@ -72,13 +72,11 @@ where
                     req.extensions_mut().insert(user);
                     let response = service.call(req).await?;
                     Ok(response)
-                },
-                Ok(None) => {
-                    Err(actix_web::error::ErrorUnauthorized("unauthorized"))
-                },
-                Err(_err) => {
-                    Err(actix_web::error::ErrorInternalServerError("internal server error"))
                 }
+                Ok(None) => Err(actix_web::error::ErrorUnauthorized("unauthorized")),
+                Err(_err) => Err(actix_web::error::ErrorInternalServerError(
+                    "internal server error",
+                )),
             }
         })
     }

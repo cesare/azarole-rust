@@ -5,7 +5,7 @@ use sqlx::prelude::FromRow;
 use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
-    models::user::{User, UserId}
+    models::user::{User, UserId},
 };
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]

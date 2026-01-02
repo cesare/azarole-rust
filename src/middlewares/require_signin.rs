@@ -1,11 +1,11 @@
 use std::rc::Rc;
 
 use actix_session::SessionExt;
-use actix_web::{Error, HttpMessage};
 use actix_web::body::MessageBody;
 use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::web::Data;
-use futures_util::future::{ok, LocalBoxFuture, Ready};
+use actix_web::{Error, HttpMessage};
+use futures_util::future::{LocalBoxFuture, Ready, ok};
 
 use crate::context::ApplicationContext;
 use crate::models::{User, UserId};
@@ -59,7 +59,8 @@ where
 
         Box::pin(async move {
             let session = req.get_session();
-            let value = session.get::<UserId>("user_id")
+            let value = session
+                .get::<UserId>("user_id")
                 .inspect_err(|e| log::error!("Failed to fetch user_id from session: {:?}", e))?;
             if value.is_none() {
                 return Err(actix_web::error::ErrorUnauthorized("unauthorized"));
@@ -79,14 +80,16 @@ where
                     req.extensions_mut().insert(user);
                     let response = service.call(req).await?;
                     Ok(response)
-                },
+                }
                 Ok(None) => {
                     session.remove("user_id");
                     Err(actix_web::error::ErrorUnauthorized("unauthorized"))
-                },
+                }
                 Err(error) => {
                     log::error!("Failed to fetch user: {:?}", error);
-                    Err(actix_web::error::ErrorInternalServerError("internal server error"))
+                    Err(actix_web::error::ErrorInternalServerError(
+                        "internal server error",
+                    ))
                 }
             }
         })

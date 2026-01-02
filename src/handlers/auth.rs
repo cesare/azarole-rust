@@ -2,16 +2,15 @@ use std::ops::Deref;
 
 use actix_session::Session;
 use actix_web::{
-    web::{post, Data, Form, ServiceConfig}, HttpResponse
+    HttpResponse,
+    web::{Data, Form, ServiceConfig, post},
 };
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use thiserror::Error;
 
-use crate::{
-    config::ApplicationConfig, context::ApplicationContext, errors::PerRequestError
-};
 use super::views::UserView;
+use crate::{config::ApplicationConfig, context::ApplicationContext, errors::PerRequestError};
 
 mod access_token_request;
 mod authentication_request;
@@ -28,7 +27,10 @@ pub(super) fn routes(config: &mut ServiceConfig) {
         .route("/callback", post().to(callback));
 }
 
-async fn request_authentication(context: Data<ApplicationContext>, session: Session) -> Result<HttpResponse, PerRequestError> {
+async fn request_authentication(
+    context: Data<ApplicationContext>,
+    session: Session,
+) -> Result<HttpResponse, PerRequestError> {
     let generator = AuthenticationRequestGenerator::new(&context);
     let authentication_request = generator.generate();
 
@@ -49,29 +51,39 @@ struct CallbackParameters {
     error: Option<String>,
 }
 
-async fn callback(context: Data<ApplicationContext>, session: Session, params: Form<CallbackParameters>) -> Result<HttpResponse, PerRequestError> {
+async fn callback(
+    context: Data<ApplicationContext>,
+    session: Session,
+    params: Form<CallbackParameters>,
+) -> Result<HttpResponse, PerRequestError> {
     let parameters = params.into_inner();
     match parameters {
-        CallbackParameters { code: Some(code), state: Some(state), error: None } => {
-            handle_success(context, session, code, state).await
-        },
-        _ => {
-            handle_failure(session).await
-        },
+        CallbackParameters {
+            code: Some(code),
+            state: Some(state),
+            error: None,
+        } => handle_success(context, session, code, state).await,
+        _ => handle_failure(session).await,
     }
 }
 
-async fn handle_success(context: Data<ApplicationContext>, session: Session, code: String, state: String) -> Result<HttpResponse, PerRequestError> {
+async fn handle_success(
+    context: Data<ApplicationContext>,
+    session: Session,
+    code: String,
+    state: String,
+) -> Result<HttpResponse, PerRequestError> {
     let saved_nonce = fetch_saved_string(&session, "google-auth-nonce")?;
     let saved_state = fetch_saved_string(&session, "google-auth-state")?;
     if state != saved_state {
-        return Err(PerRequestError::Unauthorized)
+        return Err(PerRequestError::Unauthorized);
     }
 
     let access_token_request = AccessTokenRequest::new(&context);
     let access_token_response = access_token_request.execute(&code).await?;
 
-    let id_token_verifier = IdTokenVerifier::new(&context, &access_token_response.id_token, &saved_nonce);
+    let id_token_verifier =
+        IdTokenVerifier::new(&context, &access_token_response.id_token, &saved_nonce);
     let claims = id_token_verifier.verify().await?;
 
     let finder = UserFinder::new(&context, &claims.sub);

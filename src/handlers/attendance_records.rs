@@ -1,21 +1,24 @@
 use actix_web::{
-    web::{delete, get, post, Data, Form, Path, Query, ReqData, ServiceConfig},
-    HttpResponse
+    HttpResponse,
+    web::{Data, Form, Path, Query, ReqData, ServiceConfig, delete, get, post},
 };
 use chrono::{DateTime, Local};
-use serde::{Deserialize};
+use serde::Deserialize;
 use serde_json::json;
 use validator::Validate;
 
-use crate::{
-    context::ApplicationContext, errors::PerRequestError, models::{
-        attendance_record, AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources
-    }
-};
 use super::views::{AttendanceRecordView, WorkplaceView};
+use crate::{
+    context::ApplicationContext,
+    errors::PerRequestError,
+    models::{
+        AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources,
+        attendance_record,
+    },
+};
 
 mod listing;
-use listing::{TargetMonth, AttendancesForMonth};
+use listing::{AttendancesForMonth, TargetMonth};
 
 pub(super) fn routes(config: &mut ServiceConfig) {
     config
@@ -37,8 +40,15 @@ struct IndexParameters {
     month: Option<u32>,
 }
 
-async fn index(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, params: Query<IndexParameters>) -> Result<HttpResponse, PerRequestError> {
-    let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
+async fn index(
+    context: Data<ApplicationContext>,
+    current_user: ReqData<User>,
+    path: Path<PathInfo>,
+    params: Query<IndexParameters>,
+) -> Result<HttpResponse, PerRequestError> {
+    let workplace = WorkplaceResources::new(&context, &current_user)
+        .find(path.workplace_id)
+        .await?;
 
     let target_month = TargetMonth::new_with_default_timezone(params.year, params.month);
     let finder = AttendancesForMonth::new(&context, &workplace, &target_month);
@@ -60,11 +70,20 @@ struct CreationParameters {
     datetime: DateTime<Local>,
 }
 
-async fn create(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<PathInfo>, form: Form<CreationParameters>) -> Result<HttpResponse, PerRequestError> {
-    let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
+async fn create(
+    context: Data<ApplicationContext>,
+    current_user: ReqData<User>,
+    path: Path<PathInfo>,
+    form: Form<CreationParameters>,
+) -> Result<HttpResponse, PerRequestError> {
+    let workplace = WorkplaceResources::new(&context, &current_user)
+        .find(path.workplace_id)
+        .await?;
 
     let resources = AttendanceRecordResources::new(&context, &workplace);
-    let attendance_record = resources.create(&form.event, &form.datetime.to_utc()).await?;
+    let attendance_record = resources
+        .create(&form.event, &form.datetime.to_utc())
+        .await?;
 
     let response_json = json!({
         "attendanceRecord": AttendanceRecordView::new(&attendance_record),
@@ -79,8 +98,14 @@ struct DestroyPath {
     id: AttendanceRecordId,
 }
 
-async fn destroy(context: Data<ApplicationContext>, current_user: ReqData<User>, path: Path<DestroyPath>) -> Result<HttpResponse, PerRequestError> {
-    let workplace = WorkplaceResources::new(&context, &current_user).find(path.workplace_id).await?;
+async fn destroy(
+    context: Data<ApplicationContext>,
+    current_user: ReqData<User>,
+    path: Path<DestroyPath>,
+) -> Result<HttpResponse, PerRequestError> {
+    let workplace = WorkplaceResources::new(&context, &current_user)
+        .find(path.workplace_id)
+        .await?;
 
     let resources = AttendanceRecordResources::new(&context, &workplace);
     resources.destroy(path.id).await?;

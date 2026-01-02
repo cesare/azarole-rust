@@ -1,8 +1,12 @@
 use chrono::{DateTime, Utc};
-use sqlx::FromRow;
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 
-use crate::{context::ApplicationContext, errors::DatabaseError, models::{Workplace, WorkplaceId}};
+use crate::{
+    context::ApplicationContext,
+    errors::DatabaseError,
+    models::{Workplace, WorkplaceId},
+};
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
@@ -35,7 +39,11 @@ impl<'a> AttendanceRecordResources<'a> {
         Self { context, workplace }
     }
 
-    pub async fn create(&self, event: &Event, datetime: &DateTime<Utc>) -> Result<AttendanceRecord, DatabaseError> {
+    pub async fn create(
+        &self,
+        event: &Event,
+        datetime: &DateTime<Utc>,
+    ) -> Result<AttendanceRecord, DatabaseError> {
         let statement = "insert into attendance_records (workplace_id, event, recorded_at, created_at) values ($1, $2, $3, $4) returning id, workplace_id, event, recorded_at";
         let now = Utc::now();
         let attendance_record = sqlx::query_as(statement)

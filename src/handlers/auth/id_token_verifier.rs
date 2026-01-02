@@ -1,9 +1,10 @@
 use jsonwebtoken::{
-    decode, decode_header, jwk::{Jwk, JwkSet}, Algorithm, DecodingKey, Validation
+    Algorithm, DecodingKey, Validation, decode, decode_header,
+    jwk::{Jwk, JwkSet},
 };
 use serde::Deserialize;
 
-use crate::{context::ApplicationContext};
+use crate::context::ApplicationContext;
 
 use super::AuthError;
 
@@ -25,7 +26,11 @@ pub(super) struct IdTokenVerifier<'a> {
 
 impl<'a> IdTokenVerifier<'a> {
     pub(super) fn new(context: &'a ApplicationContext, token: &'a str, nonce: &'a str) -> Self {
-        Self { context, token, nonce }
+        Self {
+            context,
+            token,
+            nonce,
+        }
     }
 
     pub(super) async fn verify(self) -> Result<Claims, AuthError> {
@@ -36,16 +41,21 @@ impl<'a> IdTokenVerifier<'a> {
             None => {
                 log::error!("Failed to find key_id {} in jwk", key_id);
                 Err(AuthError::InvalidIdToken)
-            },
+            }
         }
     }
 
     async fn fetch_jwks(&self) -> Result<JwkSet, AuthError> {
         let client = reqwest::Client::new();
-        let response = client.get("https://www.googleapis.com/oauth2/v3/certs").send().await
+        let response = client
+            .get("https://www.googleapis.com/oauth2/v3/certs")
+            .send()
+            .await
             .inspect_err(|e| log::error!("Failed to fetch google jwks: {:?}", e))?;
 
-        let jwks = response.json::<JwkSet>().await
+        let jwks = response
+            .json::<JwkSet>()
+            .await
             .inspect_err(|e| log::error!("Failed to parse google jwks: {:?}", e))?;
 
         Ok(jwks)

@@ -3,7 +3,9 @@ use chrono_tz::{Asia, Tz};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    context::ApplicationContext, errors::DatabaseError, models::{AttendanceRecord, Workplace}
+    context::ApplicationContext,
+    errors::DatabaseError,
+    models::{AttendanceRecord, Workplace},
 };
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
@@ -45,14 +47,19 @@ impl TargetMonth {
             year: Year(year),
             month: Month(month),
 
-            timezone
+            timezone,
         }
     }
 
     fn datetime_range(&self) -> (DateTime<Utc>, DateTime<Utc>) {
         let timezone = self.timezone;
 
-        let local_start_time = NaiveDate::from_ymd_opt(self.year.into(), self.month.into(), 1).unwrap().and_hms_opt(0, 0, 0).unwrap().and_local_timezone(timezone).unwrap();
+        let local_start_time = NaiveDate::from_ymd_opt(self.year.into(), self.month.into(), 1)
+            .unwrap()
+            .and_hms_opt(0, 0, 0)
+            .unwrap()
+            .and_local_timezone(timezone)
+            .unwrap();
         let local_end_time = local_start_time.checked_add_months(Months::new(1)).unwrap();
 
         let utc_start_time = local_start_time.to_utc();
@@ -68,8 +75,16 @@ pub(super) struct AttendancesForMonth<'a> {
 }
 
 impl<'a> AttendancesForMonth<'a> {
-    pub(super) fn new(context: &'a ApplicationContext, workplace: &'a Workplace, target_month: &'a TargetMonth) -> Self {
-        Self { context, workplace, target_month }
+    pub(super) fn new(
+        context: &'a ApplicationContext,
+        workplace: &'a Workplace,
+        target_month: &'a TargetMonth,
+    ) -> Self {
+        Self {
+            context,
+            workplace,
+            target_month,
+        }
     }
 
     pub(super) async fn execute(self) -> Result<Vec<AttendanceRecord>, DatabaseError> {

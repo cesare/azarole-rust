@@ -1,9 +1,7 @@
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    context::ApplicationContext,
-};
 use super::{AuthError, RedirectUri};
+use crate::context::ApplicationContext;
 
 #[derive(Serialize)]
 struct Parameters<'a> {
@@ -43,13 +41,16 @@ impl<'a> AccessTokenRequest<'a> {
         };
 
         let client = reqwest::Client::new();
-        let raw_response = client.post("https://oauth2.googleapis.com/token")
+        let raw_response = client
+            .post("https://oauth2.googleapis.com/token")
             .form(&parameters)
             .send()
             .await
             .inspect_err(|e| log::error!("Access token request failed: {:?}", e))?;
 
-        let response = raw_response.json::<AccessTokenResponse>().await
+        let response = raw_response
+            .json::<AccessTokenResponse>()
+            .await
             .inspect_err(|e| log::error!("Failed to parse access token response: {:?}", e))?;
         Ok(response)
     }
