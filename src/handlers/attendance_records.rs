@@ -11,10 +11,8 @@ use super::views::{AttendanceRecordView, WorkplaceView};
 use crate::{
     context::ApplicationContext,
     errors::PerRequestError,
-    models::{
-        AttendanceRecordId, AttendanceRecordResources, User, WorkplaceId, WorkplaceResources,
-        attendance_record,
-    },
+    models::{AttendanceRecordId, User, WorkplaceId, WorkplaceResources, attendance_record},
+    repositories::RepositoryFactory,
 };
 
 mod listing;
@@ -80,9 +78,9 @@ async fn create(
         .find(path.workplace_id)
         .await?;
 
-    let resources = AttendanceRecordResources::new(&context, &workplace);
-    let attendance_record = resources
-        .create(&form.event, &form.datetime.to_utc())
+    let repository = context.repositories.attendance_record();
+    let attendance_record = repository
+        .create(&workplace, &form.event, &form.datetime.to_utc())
         .await?;
 
     let response_json = json!({
@@ -107,8 +105,8 @@ async fn destroy(
         .find(path.workplace_id)
         .await?;
 
-    let resources = AttendanceRecordResources::new(&context, &workplace);
-    resources.destroy(path.id).await?;
+    let repository = context.repositories.attendance_record();
+    repository.destroy(&workplace, path.id).await?;
 
     let response = HttpResponse::Ok().finish();
     Ok(response)
