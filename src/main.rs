@@ -7,17 +7,8 @@ use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use env_logger::Env;
 
-mod args;
-mod config;
-mod context;
-mod errors;
-mod handlers;
-mod middlewares;
-mod models;
-mod secrets;
-
-use self::config::ApplicationConfig;
-use self::context::ApplicationContext;
+use azarole::config::ApplicationConfig;
+use azarole::context::ApplicationContext;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
     Cors::default()
@@ -35,7 +26,7 @@ fn build_session_middleware(context: &ApplicationContext) -> SessionMiddleware<C
 async fn main() -> anyhow::Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
-    let args = args::parse();
+    let args = azarole::args::parse();
     let config = ApplicationConfig::load(&args).await?;
     let context = ApplicationContext::new(&config)?;
     let server_config = config.server.clone();
@@ -46,7 +37,7 @@ async fn main() -> anyhow::Result<()> {
             .wrap(build_cors(&config))
             .wrap(build_session_middleware(&context))
             .app_data(Data::new(context.clone()))
-            .configure(handlers::routes)
+            .configure(azarole::handlers::routes)
     });
     server.bind((server_config.bind, server_config.port))?.run().await?;
     Ok(())

@@ -14,7 +14,7 @@ mod workplaces;
 mod signout;
 mod views;
 
-pub(super) fn routes(config: &mut ServiceConfig) {
+pub fn routes(config: &mut ServiceConfig) {
     config
         .service(scope("/api").wrap(RequireApiKey::new()).configure(api::routes))
         .service(scope("/auth/google").configure(auth::routes))
