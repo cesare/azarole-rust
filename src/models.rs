@@ -6,4 +6,4 @@ pub mod workplace;
 pub use api_key::{ApiKey, ApiKeyId};
 pub use attendance_record::{AttendanceRecord, AttendanceRecordId};
 pub use user::{User, UserId};
-pub use workplace::{Workplace, WorkplaceId, WorkplaceResources};
+pub use workplace::{Workplace, WorkplaceId};

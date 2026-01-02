@@ -11,7 +11,7 @@ use super::views::{AttendanceRecordView, WorkplaceView};
 use crate::{
     context::ApplicationContext,
     errors::PerRequestError,
-    models::{AttendanceRecordId, User, WorkplaceId, WorkplaceResources, attendance_record},
+    models::{AttendanceRecordId, User, WorkplaceId, attendance_record},
     repositories::RepositoryFactory,
 };
 
@@ -44,8 +44,10 @@ async fn index(
     path: Path<PathInfo>,
     params: Query<IndexParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let workplace = WorkplaceResources::new(&context, &current_user)
-        .find(path.workplace_id)
+    let workplace = context
+        .repositories
+        .workplace()
+        .find(&current_user, path.workplace_id)
         .await?;
 
     let target_month = TargetMonth::new_with_default_timezone(params.year, params.month);
@@ -74,8 +76,10 @@ async fn create(
     path: Path<PathInfo>,
     form: Form<CreationParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let workplace = WorkplaceResources::new(&context, &current_user)
-        .find(path.workplace_id)
+    let workplace = context
+        .repositories
+        .workplace()
+        .find(&current_user, path.workplace_id)
         .await?;
 
     let repository = context.repositories.attendance_record();
@@ -101,8 +105,10 @@ async fn destroy(
     current_user: ReqData<User>,
     path: Path<DestroyPath>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let workplace = WorkplaceResources::new(&context, &current_user)
-        .find(path.workplace_id)
+    let workplace = context
+        .repositories
+        .workplace()
+        .find(&current_user, path.workplace_id)
         .await?;
 
     let repository = context.repositories.attendance_record();
