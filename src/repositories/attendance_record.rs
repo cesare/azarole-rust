@@ -67,4 +67,20 @@ where
 
         Ok(())
     }
+
+    async fn list(
+        &self,
+        workplace: &Workplace,
+        start_time: &DateTime<Utc>,
+        end_time: &DateTime<Utc>,
+    ) -> Result<Vec<AttendanceRecord>, DatabaseError> {
+        let statement = "select id, workplace_id, event, recorded_at from attendance_records where workplace_id = $1 and recorded_at >= $2 and recorded_at < $3 order by recorded_at";
+        let attendance_records: Vec<AttendanceRecord> = sqlx::query_as(statement)
+            .bind(workplace.id)
+            .bind(start_time)
+            .bind(end_time)
+            .fetch_all(self.executor)
+            .await?;
+        Ok(attendance_records)
+    }
 }

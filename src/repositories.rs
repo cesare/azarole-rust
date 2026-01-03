@@ -39,6 +39,12 @@ pub trait AttendanceRecordRepository {
         workplace: &Workplace,
         id: AttendanceRecordId,
     ) -> Result<(), DatabaseError>;
+    async fn list(
+        &self,
+        workplace: &Workplace,
+        start_time: &DateTime<Utc>,
+        end_time: &DateTime<Utc>,
+    ) -> Result<Vec<AttendanceRecord>, DatabaseError>;
 }
 
 #[async_trait]
