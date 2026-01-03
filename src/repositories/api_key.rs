@@ -42,6 +42,18 @@ where
         Ok(api_keys)
     }
 
+    async fn find_by_digest(&self, digest: &str) -> Result<Option<ApiKey>, DatabaseError> {
+        let result: Option<ApiKey> = sqlx::query_as(
+            "select id, user_id, name, digest, created_at from api_keys where digest = $1",
+        )
+        .bind(digest)
+        .fetch_optional(self.executor)
+        .await
+        .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
+
+        Ok(result)
+    }
+
     async fn create(&self, user: &User, name: &str, digest: &str) -> Result<ApiKey, DatabaseError> {
         let statement = "insert into api_keys (user_id, name, digest, created_at) values ($1, $2, $3, $4) returning id, user_id, name, digest, created_at";
         let now = Utc::now();
