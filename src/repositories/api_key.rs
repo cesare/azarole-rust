@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use async_trait::async_trait;
+use chrono::Utc;
 use sqlx::{Executor, Sqlite};
 
 use super::ApiKeyRepository;
@@ -39,6 +40,19 @@ where
             .inspect_err(|e| log::error!("Failed to query api_keys: {:?}", e))?;
 
         Ok(api_keys)
+    }
+
+    async fn create(&self, user: &User, name: &str, digest: &str) -> Result<ApiKey, DatabaseError> {
+        let statement = "insert into api_keys (user_id, name, digest, created_at) values ($1, $2, $3, $4) returning id, user_id, name, digest, created_at";
+        let now = Utc::now();
+        let api_key: ApiKey = sqlx::query_as(statement)
+            .bind(user.id)
+            .bind(name)
+            .bind(digest)
+            .bind(now)
+            .fetch_one(self.executor)
+            .await?;
+        Ok(api_key)
     }
 
     async fn destroy(&self, user: &User, id: &ApiKeyId) -> Result<(), DatabaseError> {

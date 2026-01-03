@@ -21,6 +21,7 @@ mod workplace;
 #[async_trait]
 pub trait ApiKeyRepository {
     async fn list(&self, user: &User) -> Result<Vec<ApiKey>, DatabaseError>;
+    async fn create(&self, user: &User, name: &str, digest: &str) -> Result<ApiKey, DatabaseError>;
     async fn destroy(&self, user: &User, id: &ApiKeyId) -> Result<(), DatabaseError>;
 }
 
