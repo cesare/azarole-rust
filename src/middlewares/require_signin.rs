@@ -83,8 +83,7 @@ where
             match result {
                 Ok(Some(user)) => {
                     req.extensions_mut().insert(user);
-                    let response = service.call(req).await?;
-                    Ok(response)
+                    service.call(req).await
                 }
                 Ok(None) => {
                     session.remove("user_id");
