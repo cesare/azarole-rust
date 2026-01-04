@@ -5,17 +5,18 @@ use sqlx::{Pool, Sqlite};
 use crate::{
     errors::DatabaseError,
     models::{
-        ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, User, Workplace, WorkplaceId,
-        attendance_record::Event,
+        ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, User, UserId, Workplace,
+        WorkplaceId, attendance_record::Event,
     },
     repositories::{
         api_key::RdbApiKeyRepository, attendance_record::RdbAttendanceRecordRepository,
-        workplace::RdbWorkplaceRepository,
+        user::RdbUserRepository, workplace::RdbWorkplaceRepository,
     },
 };
 
 mod api_key;
 mod attendance_record;
+mod user;
 mod workplace;
 
 #[async_trait]
@@ -48,6 +49,11 @@ pub trait AttendanceRecordRepository {
 }
 
 #[async_trait]
+pub trait UserRepository {
+    async fn find_optional(&self, id: UserId) -> Result<Option<User>, DatabaseError>;
+}
+
+#[async_trait]
 pub trait WorkplaceRepository {
     async fn list(&self, user: &User) -> Result<Vec<Workplace>, DatabaseError>;
     async fn create(&self, user: &User, name: &str) -> Result<Workplace, DatabaseError>;
@@ -57,6 +63,7 @@ pub trait WorkplaceRepository {
 pub trait RepositoryFactory {
     fn api_key(&self) -> Box<dyn ApiKeyRepository + '_>;
     fn attendance_record(&self) -> Box<dyn AttendanceRecordRepository + '_>;
+    fn user(&self) -> Box<dyn UserRepository + '_>;
     fn workplace(&self) -> Box<dyn WorkplaceRepository + '_>;
 }
 
@@ -78,6 +85,10 @@ impl RepositoryFactory for RdbRepositories {
 
     fn attendance_record(&self) -> Box<dyn AttendanceRecordRepository + '_> {
         Box::new(RdbAttendanceRecordRepository::new(&self.pool))
+    }
+
+    fn user(&self) -> Box<dyn UserRepository + '_> {
+        Box::new(RdbUserRepository::new(&self.pool))
     }
 
     fn workplace(&self) -> Box<dyn WorkplaceRepository + '_> {

@@ -8,7 +8,9 @@ use actix_web::{Error, HttpMessage};
 use futures_util::future::{LocalBoxFuture, Ready, ok};
 
 use crate::context::ApplicationContext;
+use crate::errors::DatabaseError;
 use crate::models::{User, UserId};
+use crate::repositories::RepositoryFactory;
 
 pub struct RequireSignin;
 
@@ -55,6 +57,15 @@ where
     actix_service::forward_ready!(service);
 
     fn call(&self, req: ServiceRequest) -> Self::Future {
+        async fn find_user(
+            request: &ServiceRequest,
+            user_id: UserId,
+        ) -> Result<Option<User>, DatabaseError> {
+            let context: &Data<ApplicationContext> = request.app_data().unwrap();
+            let repository = context.repositories.user();
+            repository.find_optional(user_id).await
+        }
+
         let service = Rc::clone(&self.service);
 
         Box::pin(async move {
@@ -67,13 +78,7 @@ where
             }
 
             let user_id = value.unwrap();
-
-            let context: &Data<ApplicationContext> = req.app_data().unwrap();
-            let result: Result<Option<User>, sqlx::error::Error> =
-                sqlx::query_as("select id from users where id = $1")
-                    .bind(user_id)
-                    .fetch_optional(&context.database.pool)
-                    .await;
+            let result: Result<Option<User>, DatabaseError> = find_user(&req, user_id).await;
 
             match result {
                 Ok(Some(user)) => {
