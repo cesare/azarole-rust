@@ -1,9 +1,8 @@
-use chrono::{DateTime, Utc};
 use serde::Serialize;
 
 use crate::models::{
-    ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, User, UserId, Workplace, WorkplaceId,
-    attendance_record,
+    ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, Timestamp, User, UserId, Workplace,
+    WorkplaceId, attendance_record,
 };
 
 #[derive(Serialize)]
@@ -11,7 +10,7 @@ use crate::models::{
 pub(in crate::handlers) struct ApiKeyView<'a> {
     id: &'a ApiKeyId,
     name: &'a String,
-    created_at: &'a DateTime<Utc>,
+    created_at: &'a Timestamp,
 }
 
 impl<'a> ApiKeyView<'a> {
@@ -29,7 +28,7 @@ impl<'a> ApiKeyView<'a> {
 pub(in crate::handlers) struct AttendanceRecordView<'a> {
     id: &'a AttendanceRecordId,
     event: &'a attendance_record::Event,
-    recorded_at: &'a DateTime<Utc>,
+    recorded_at: &'a Timestamp,
 }
 
 impl<'a> AttendanceRecordView<'a> {

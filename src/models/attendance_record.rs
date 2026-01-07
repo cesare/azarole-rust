@@ -1,8 +1,7 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-use crate::models::WorkplaceId;
+use crate::models::{Timestamp, WorkplaceId};
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
@@ -22,5 +21,5 @@ pub struct AttendanceRecord {
     pub id: AttendanceRecordId,
     pub workplace_id: WorkplaceId,
     pub event: Event,
-    pub recorded_at: DateTime<Utc>,
+    pub recorded_at: Timestamp,
 }

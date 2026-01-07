@@ -1,7 +1,7 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
+use super::Timestamp;
 use crate::models::user::UserId;
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
@@ -16,5 +16,5 @@ pub struct ApiKey {
     pub user_id: UserId,
     pub name: String,
     pub digest: String,
-    pub created_at: DateTime<Utc>,
+    pub created_at: Timestamp,
 }

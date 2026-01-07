@@ -5,5 +5,12 @@ pub mod workplace;
 
 pub use api_key::{ApiKey, ApiKeyId};
 pub use attendance_record::{AttendanceRecord, AttendanceRecordId};
+use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 pub use user::{User, UserId};
 pub use workplace::{Workplace, WorkplaceId};
+
+#[derive(Clone, Deserialize, Serialize, sqlx::Type)]
+#[sqlx(transparent)]
+#[repr(transparent)]
+pub struct Timestamp(DateTime<Utc>);
