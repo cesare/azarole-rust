@@ -1,11 +1,10 @@
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
 use sqlx::{Pool, Sqlite};
 
 use crate::{
     errors::DatabaseError,
     models::{
-        ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, User, UserId, Workplace,
+        ApiKey, ApiKeyId, AttendanceRecord, AttendanceRecordId, Timestamp, User, UserId, Workplace,
         WorkplaceId, attendance_record::Event,
     },
     repositories::{
@@ -33,7 +32,7 @@ pub trait AttendanceRecordRepository {
         &self,
         workplace: &Workplace,
         event: &Event,
-        datetime: &DateTime<Utc>,
+        datetime: &Timestamp,
     ) -> Result<AttendanceRecord, DatabaseError>;
     async fn destroy(
         &self,
@@ -43,8 +42,8 @@ pub trait AttendanceRecordRepository {
     async fn list(
         &self,
         workplace: &Workplace,
-        start_time: &DateTime<Utc>,
-        end_time: &DateTime<Utc>,
+        start_time: &Timestamp,
+        end_time: &Timestamp,
     ) -> Result<Vec<AttendanceRecord>, DatabaseError>;
 }
 

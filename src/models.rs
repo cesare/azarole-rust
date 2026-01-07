@@ -14,3 +14,9 @@ pub use workplace::{Workplace, WorkplaceId};
 #[sqlx(transparent)]
 #[repr(transparent)]
 pub struct Timestamp(DateTime<Utc>);
+
+impl From<DateTime<Utc>> for Timestamp {
+    fn from(value: DateTime<Utc>) -> Self {
+        Self(value)
+    }
+}

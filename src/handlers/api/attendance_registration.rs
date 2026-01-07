@@ -31,6 +31,8 @@ impl AttendanceRegistration {
             .find(user, workplace_id)
             .await?;
         let repository = self.context.repositories.attendance_record();
-        repository.create(&workplace, &event, &Utc::now()).await
+        repository
+            .create(&workplace, &event, &Utc::now().into())
+            .await
     }
 }

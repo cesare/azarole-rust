@@ -1,12 +1,14 @@
 use std::marker::PhantomData;
 
 use async_trait::async_trait;
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use sqlx::{Executor, Sqlite};
 
 use crate::{
     errors::DatabaseError,
-    models::{AttendanceRecord, AttendanceRecordId, Workplace, attendance_record::Event},
+    models::{
+        AttendanceRecord, AttendanceRecordId, Timestamp, Workplace, attendance_record::Event,
+    },
     repositories::AttendanceRecordRepository,
 };
 
@@ -36,7 +38,7 @@ where
         &self,
         workplace: &Workplace,
         event: &Event,
-        datetime: &DateTime<Utc>,
+        datetime: &Timestamp,
     ) -> Result<AttendanceRecord, DatabaseError> {
         let statement = "insert into attendance_records (workplace_id, event, recorded_at, created_at) values ($1, $2, $3, $4) returning id, workplace_id, event, recorded_at";
         let now = Utc::now();
@@ -71,8 +73,8 @@ where
     async fn list(
         &self,
         workplace: &Workplace,
-        start_time: &DateTime<Utc>,
-        end_time: &DateTime<Utc>,
+        start_time: &Timestamp,
+        end_time: &Timestamp,
     ) -> Result<Vec<AttendanceRecord>, DatabaseError> {
         let statement = "select id, workplace_id, event, recorded_at from attendance_records where workplace_id = $1 and recorded_at >= $2 and recorded_at < $3 order by recorded_at";
         let attendance_records: Vec<AttendanceRecord> = sqlx::query_as(statement)

@@ -84,7 +84,7 @@ async fn create(
 
     let repository = context.repositories.attendance_record();
     let attendance_record = repository
-        .create(&workplace, &form.event, &form.datetime.to_utc())
+        .create(&workplace, &form.event, &form.datetime.to_utc().into())
         .await?;
 
     let response_json = json!({

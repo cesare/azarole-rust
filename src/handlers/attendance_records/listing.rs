@@ -1,11 +1,11 @@
-use chrono::{DateTime, Datelike, Months, NaiveDate, Utc};
+use chrono::{Datelike, Months, NaiveDate, Utc};
 use chrono_tz::{Asia, Tz};
 use serde::{Deserialize, Serialize};
 
 use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
-    models::{AttendanceRecord, Workplace},
+    models::{AttendanceRecord, Timestamp, Workplace},
     repositories::RepositoryFactory,
 };
 
@@ -52,7 +52,7 @@ impl TargetMonth {
         }
     }
 
-    fn datetime_range(&self) -> (DateTime<Utc>, DateTime<Utc>) {
+    fn datetime_range(&self) -> (Timestamp, Timestamp) {
         let timezone = self.timezone;
 
         let local_start_time = NaiveDate::from_ymd_opt(self.year.into(), self.month.into(), 1)
@@ -63,8 +63,8 @@ impl TargetMonth {
             .unwrap();
         let local_end_time = local_start_time.checked_add_months(Months::new(1)).unwrap();
 
-        let utc_start_time = local_start_time.to_utc();
-        let utc_end_time = local_end_time.to_utc();
+        let utc_start_time = local_start_time.to_utc().into();
+        let utc_end_time = local_end_time.to_utc().into();
         (utc_start_time, utc_end_time)
     }
 }
