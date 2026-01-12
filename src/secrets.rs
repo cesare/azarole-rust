@@ -6,6 +6,12 @@ use std::ops::Deref;
 #[derive(Clone)]
 pub struct Base64Encoded(Vec<u8>);
 
+impl Base64Encoded {
+    pub fn new(value: Vec<u8>) -> Self {
+        Self(value)
+    }
+}
+
 impl Deref for Base64Encoded {
     type Target = Vec<u8>;
 
