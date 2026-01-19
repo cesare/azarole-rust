@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-use crate::models::{IdType, Timestamp, WorkplaceId};
+use super::{IdType, Timestamp, WorkplaceId};
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
