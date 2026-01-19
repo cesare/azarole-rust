@@ -10,6 +10,8 @@ use serde::{Deserialize, Serialize};
 pub use user::{User, UserId};
 pub use workplace::{Workplace, WorkplaceId};
 
+type IdType = u32;
+
 #[derive(Clone, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
 #[repr(transparent)]

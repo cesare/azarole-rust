@@ -1,12 +1,12 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 
-use crate::models::{Timestamp, WorkplaceId};
+use crate::models::{IdType, Timestamp, WorkplaceId};
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
 #[repr(transparent)]
-pub struct AttendanceRecordId(u32);
+pub struct AttendanceRecordId(IdType);
 
 #[derive(Clone, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(rename_all = "kebab-case")]

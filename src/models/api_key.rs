@@ -2,12 +2,12 @@ use serde::{Deserialize, Serialize};
 use sqlx::prelude::FromRow;
 
 use super::Timestamp;
-use crate::models::user::UserId;
+use crate::models::{IdType, user::UserId};
 
 #[derive(Clone, Copy, Deserialize, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
 #[repr(transparent)]
-pub struct ApiKeyId(u32);
+pub struct ApiKeyId(IdType);
 
 #[derive(Clone, Deserialize, FromRow, Serialize)]
 #[allow(dead_code)]
