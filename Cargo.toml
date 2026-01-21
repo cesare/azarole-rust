@@ -16,28 +16,28 @@ actix-session = { version = "0.11.0", features = ["cookie-session"] }
 actix-web = "4.12.1"
 actix-web-httpauth = "0.8.2"
 actix-web-validator = "7.0.0"
-anyhow = "~1.0.100"
+anyhow = "1.0.100"
 async-trait = "0.1.89"
-base64 = "~0.22.1"
-clap = { version = "~4.5.54", features = ["derive"] }
-chrono = { version = "~0.4.43", features = ["serde"] }
-chrono-tz = "~0.10.4"
-env_logger = "~0.11.8"
-envy = "~0.4.2"
-futures-util = "~0.3.31"
+base64 = "0.22.1"
+clap = { version = "4.5.54", features = ["derive"] }
+chrono = { version = "0.4.43", features = ["serde"] }
+chrono-tz = "0.10.4"
+env_logger = "0.11.8"
+envy = "0.4.2"
+futures-util = "0.3.31"
 jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
-hex = "~0.4.3"
-hmac = "~0.12.1"
-log = "~0.4.29"
-rand = "~0.9.2"
+hex = "0.4.3"
+hmac = "0.12.1"
+log = "0.4.29"
+rand = "0.9.2"
 reqwest = { version = "0.13.1", features = ["form", "json"] }
-serde = "~1.0.228"
-serde_derive = "~1.0.226"
-serde_json = "~1.0.149"
-sha2 = "~0.10.9"
-sqlx = { version = "~0.8.6", features = ["chrono", "migrate", "runtime-tokio", "sqlite"] }
-thiserror = "~2.0.18"
+serde = "1.0.228"
+serde_derive = "1.0.226"
+serde_json = "1.0.149"
+sha2 = "0.10.9"
+sqlx = { version = "0.8.6", features = ["chrono", "migrate", "runtime-tokio", "sqlite"] }
+thiserror = "2.0.18"
 tokio = { version = "1.49.0", features = ["fs", "macros", "rt-multi-thread"] }
-toml = "~0.9.11"
-url = "~2.5.8"
-validator = { version = "~0.20.0", features = ["derive"] }
+toml = "0.9.11"
+url = "2.5.8"
+validator = { version = "0.20.0", features = ["derive"] }
