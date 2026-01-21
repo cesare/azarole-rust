@@ -73,3 +73,9 @@ impl From<SessionInsertError> for PerRequestError {
         Self::ServerError
     }
 }
+
+impl From<anyhow::Error> for PerRequestError {
+    fn from(_value: anyhow::Error) -> Self {
+        Self::ServerError
+    }
+}
