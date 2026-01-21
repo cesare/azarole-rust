@@ -1,13 +1,11 @@
 use base64::{Engine, engine::general_purpose::URL_SAFE};
-use hmac::{Hmac, Mac};
 use rand::{Rng as _, SeedableRng as _, rngs::StdRng};
 use serde::Serialize;
-use sha2::Sha256;
 
 use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
-    models::{ApiKeyId, User},
+    models::{ApiKeyId, TokenDigester, User},
     repositories::RepositoryFactory,
 };
 
@@ -57,12 +55,7 @@ impl<'a> ApiKeyRegistration<'a> {
     }
 
     fn digest_token(&self, token: &str) -> String {
-        let mut mac =
-            Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key)
-                .unwrap();
-        mac.update(token.as_bytes());
-        let result = mac.finalize();
-        let bytes = result.into_bytes();
-        hex::encode(bytes)
+        let digester = TokenDigester::new(&self.context.secrets.api_key.digesting_secret_key);
+        digester.digest_token(token).unwrap()
     }
 }

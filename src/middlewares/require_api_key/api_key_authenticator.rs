@@ -1,9 +1,7 @@
 use anyhow::Result;
-use hmac::{Hmac, Mac};
-use sha2::Sha256;
 
 use crate::context::ApplicationContext;
-use crate::models::User;
+use crate::models::{TokenDigester, User};
 use crate::repositories::RepositoryFactory;
 
 pub(super) struct ApiKeyAuthenticator<'a> {
@@ -26,14 +24,7 @@ impl<'a> ApiKeyAuthenticator<'a> {
     }
 
     fn digest_token(&self) -> Result<String> {
-        let mut mac =
-            Hmac::<Sha256>::new_from_slice(&self.context.secrets.api_key.digesting_secret_key)
-                .inspect_err(|e| log::error!("Failed to prepare Hmac object: {:?}", e))?;
-
-        mac.update(self.token.as_bytes());
-        let result = mac.finalize();
-        let bytes = result.into_bytes();
-        let digest = hex::encode(bytes);
-        Ok(digest)
+        let digester = TokenDigester::new(&self.context.secrets.api_key.digesting_secret_key);
+        digester.digest_token(self.token)
     }
 }
