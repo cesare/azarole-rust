@@ -8,7 +8,7 @@ use super::{IdType, Timestamp, WorkplaceId};
 #[repr(transparent)]
 pub struct AttendanceRecordId(IdType);
 
-#[derive(Clone, Deserialize, Serialize, sqlx::Type)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq, Serialize, sqlx::Type)]
 #[sqlx(rename_all = "kebab-case")]
 #[serde(rename_all = "kebab-case")]
 pub enum Event {

@@ -12,7 +12,7 @@ pub use workplace::{Workplace, WorkplaceId};
 
 type IdType = u32;
 
-#[derive(Clone, Deserialize, Serialize, sqlx::Type)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq, Serialize, sqlx::Type)]
 #[sqlx(transparent)]
 #[repr(transparent)]
 pub struct Timestamp(DateTime<Utc>);
