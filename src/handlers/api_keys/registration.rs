@@ -1,11 +1,10 @@
 use base64::{Engine, engine::general_purpose::URL_SAFE};
-use rand::{Rng as _, SeedableRng as _, rngs::StdRng};
 use serde::Serialize;
 
 use crate::{
     context::ApplicationContext,
     errors::DatabaseError,
-    models::{ApiKeyId, TokenDigester, User},
+    models::{ApiKeyId, TokenDigester, TokenGenerator, User},
     repositories::RepositoryFactory,
 };
 
@@ -47,11 +46,8 @@ impl<'a> ApiKeyRegistration<'a> {
     }
 
     fn generate_token(&self) -> String {
-        let mut rng = StdRng::from_os_rng();
-        let mut bytes = [0u8; 96];
-        rng.fill(&mut bytes[..]);
-
-        URL_SAFE.encode(bytes)
+        let raw_token = TokenGenerator.generate();
+        URL_SAFE.encode(&raw_token)
     }
 
     fn digest_token(&self, token: &str) -> String {

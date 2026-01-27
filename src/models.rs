@@ -3,7 +3,7 @@ pub mod attendance_record;
 pub mod user;
 pub mod workplace;
 
-pub use api_key::{ApiKey, ApiKeyId, TokenDigester};
+pub use api_key::{ApiKey, ApiKeyId, TokenDigester, TokenGenerator};
 pub use attendance_record::{AttendanceRecord, AttendanceRecordId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
