@@ -74,6 +74,7 @@ pub fn create_session_middleware() -> SessionMiddleware<CookieSessionStore> {
     SessionMiddleware::new(CookieSessionStore::default(), session_key())
 }
 
+#[allow(dead_code)]
 pub fn generate_cookie_value_with_signin_user(user_id: u32) -> String {
     let mut session_state: HashMap<String, String> = HashMap::new();
     session_state.insert("user_id".to_owned(), user_id.to_string());
