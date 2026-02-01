@@ -8,6 +8,7 @@ use azarole::{
     repositories::RdbRepositories,
     secrets::{ApikeyConfig, Base64Encoded, GoogleAuthConfig, Secrets, SessionConfig},
 };
+use base64::{Engine as _, engine::general_purpose::URL_SAFE};
 use sqlx::SqlitePool;
 
 fn create_config() -> ApplicationConfig {
@@ -34,7 +35,12 @@ fn create_config() -> ApplicationConfig {
 
 fn create_secrets() -> Secrets {
     let api_key = ApikeyConfig {
-        digesting_secret_key: Base64Encoded::new(Key::generate().master().to_owned()),
+        digesting_secret_key: Base64Encoded::new(
+            // = [0, 1, ..., 31]
+            URL_SAFE
+                .decode("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=")
+                .unwrap(),
+        ),
     };
     let google_auth = GoogleAuthConfig {
         client_id: "dummy-google-client-id".to_string(),
