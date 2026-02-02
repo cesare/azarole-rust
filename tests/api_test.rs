@@ -84,6 +84,33 @@ async fn clock_in_with_invalid_api_key(pool: SqlitePool) {
     assert_eq!(records.iter().count(), 0);
 }
 
+#[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
+async fn clock_in_on_another_ones_workplace(pool: SqlitePool) {
+    let context = common::create_context(pool.clone());
+    let app = test::init_service(
+        App::new()
+            .wrap(common::create_session_middleware())
+            .app_data(Data::new(context))
+            .configure(azarole::handlers::routes),
+    )
+    .await;
+
+    // api key is for user#1
+    let valid_api_key = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5f";
+    // request on user#2's workplace
+    let request = test::TestRequest::post()
+        .uri("/api/workplaces/3/clock_ins")
+        .insert_header(("Authorization", format!("Bearer {valid_api_key}")))
+        .to_request();
+    let response = test::call_service(&app, request).await;
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+    let records: Vec<AttendanceRecord> = sqlx::query_as("select id, workplace_id, event, recorded_at from attendance_records where workplace_id = 3 order by recorded_at desc")
+        .fetch_all(&pool)
+        .await.unwrap();
+    assert_eq!(records.iter().count(), 0);
+}
+
 #[sqlx::test(fixtures("users", "workplaces"))]
 async fn clock_out_without_api_key(pool: SqlitePool) {
     let context = common::create_context(pool);
@@ -159,6 +186,33 @@ async fn clock_out_with_invalid_api_key(pool: SqlitePool) {
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 
     let records: Vec<AttendanceRecord> = sqlx::query_as("select id, workplace_id, event, recorded_at from attendance_records where workplace_id = $1")
+        .fetch_all(&pool)
+        .await.unwrap();
+    assert_eq!(records.iter().count(), 0);
+}
+
+#[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
+async fn clock_out_on_another_ones_workplace(pool: SqlitePool) {
+    let context = common::create_context(pool.clone());
+    let app = test::init_service(
+        App::new()
+            .wrap(common::create_session_middleware())
+            .app_data(Data::new(context))
+            .configure(azarole::handlers::routes),
+    )
+    .await;
+
+    // api key is for user#1
+    let valid_api_key = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5f";
+    // request on user#2's workplace
+    let request = test::TestRequest::post()
+        .uri("/api/workplaces/3/clock_outs")
+        .insert_header(("Authorization", format!("Bearer {valid_api_key}")))
+        .to_request();
+    let response = test::call_service(&app, request).await;
+    assert_eq!(response.status(), StatusCode::NOT_FOUND);
+
+    let records: Vec<AttendanceRecord> = sqlx::query_as("select id, workplace_id, event, recorded_at from attendance_records where workplace_id = 3 order by recorded_at desc")
         .fetch_all(&pool)
         .await.unwrap();
     assert_eq!(records.iter().count(), 0);
