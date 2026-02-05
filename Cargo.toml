@@ -19,7 +19,7 @@ actix-web-validator = "7.0.0"
 anyhow = "1.0.100"
 async-trait = "0.1.89"
 base64 = "0.22.1"
-clap = { version = "4.5.56", features = ["derive"] }
+clap = { version = "4.5.57", features = ["derive"] }
 chrono = { version = "0.4.43", features = ["serde"] }
 chrono-tz = "0.10.4"
 env_logger = "0.11.8"
