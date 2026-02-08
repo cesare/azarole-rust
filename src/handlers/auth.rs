@@ -14,6 +14,7 @@ use crate::{config::ApplicationConfig, context::ApplicationContext, errors::PerR
 
 mod access_token_request;
 mod authentication_request;
+mod google_jwks;
 mod id_token_verifier;
 mod user_finder;
 use access_token_request::AccessTokenRequest;
