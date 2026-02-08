@@ -83,9 +83,10 @@ async fn handle_success(
     let access_token_request = AccessTokenRequest::new(&context);
     let access_token_response = access_token_request.execute(&code).await?;
 
-    let id_token_verifier =
-        IdTokenVerifier::new(&context, &access_token_response.id_token, &saved_nonce);
-    let claims = id_token_verifier.verify().await?;
+    let id_token_verifier = IdTokenVerifier::new(&context);
+    let claims = id_token_verifier
+        .verify(&access_token_response.id_token, &saved_nonce)
+        .await?;
 
     let finder = UserFinder::new(&context, &claims.sub);
     let user = finder.execute().await?;

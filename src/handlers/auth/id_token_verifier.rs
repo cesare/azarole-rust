@@ -17,28 +17,21 @@ pub(super) struct Claims {
 
 pub(super) struct IdTokenVerifier<'a> {
     context: &'a ApplicationContext,
-    token: &'a str,
-    nonce: &'a str,
     jwks: GoogleJwks,
 }
 
 impl<'a> IdTokenVerifier<'a> {
-    pub(super) fn new(context: &'a ApplicationContext, token: &'a str, nonce: &'a str) -> Self {
+    pub(super) fn new(context: &'a ApplicationContext) -> Self {
         let jwks = GoogleJwks::default();
 
-        Self {
-            context,
-            token,
-            nonce,
-            jwks,
-        }
+        Self { context, jwks }
     }
 
-    pub(super) async fn verify(self) -> Result<Claims, AuthError> {
-        let key_id = self.find_key_id(self.token)?;
+    pub(super) async fn verify(&self, token: &str, nonce: &str) -> Result<Claims, AuthError> {
+        let key_id = self.find_key_id(token)?;
         let jwks = self.jwks.fetch().await?;
         match jwks.find(&key_id) {
-            Some(jwk) => self.verify_id_token(jwk, self.token, self.nonce),
+            Some(jwk) => self.verify_id_token(jwk, token, nonce),
             None => {
                 log::error!("Failed to find key_id {} in jwk", key_id);
                 Err(AuthError::InvalidIdToken)
