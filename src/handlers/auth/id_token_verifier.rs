@@ -1,7 +1,7 @@
 use jsonwebtoken::{Algorithm, DecodingKey, Validation, decode, decode_header, jwk::Jwk};
 use serde::Deserialize;
 
-use crate::{context::ApplicationContext, handlers::auth::google_jwks::GoogleJwks};
+use crate::handlers::auth::google_jwks::GoogleJwks;
 
 use super::AuthError;
 
@@ -15,15 +15,15 @@ pub(super) struct Claims {
     pub(super) sub: String,
 }
 
-pub(super) struct IdTokenVerifier<'a> {
-    context: &'a ApplicationContext,
+pub(super) struct IdTokenVerifier {
+    google_client_id: String,
     jwks: GoogleJwks,
 }
 
-impl<'a> IdTokenVerifier<'a> {
-    pub(super) fn new(context: &'a ApplicationContext) -> Self {
+impl IdTokenVerifier {
+    pub(super) fn new(google_client_id: String) -> Self {
         Self {
-            context,
+            google_client_id,
             jwks: GoogleJwks,
         }
     }
@@ -57,10 +57,8 @@ impl<'a> IdTokenVerifier<'a> {
         let decoding_key = DecodingKey::from_jwk(jwk)
             .inspect_err(|e| log::error!("Failed to detect decoding key from jwk: {:?}", e))?;
 
-        let client_id = &self.context.secrets.google_auth.client_id;
-
         let mut validation = Validation::new(Algorithm::RS256);
-        validation.set_audience(&[client_id]);
+        validation.set_audience(&[self.google_client_id.as_str()]);
 
         let jwt = decode::<Claims>(token, &decoding_key, &validation)
             .inspect_err(|e| log::error!("Failed to decode claims from token: {:?}", e))?;

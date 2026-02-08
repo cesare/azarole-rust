@@ -83,7 +83,7 @@ async fn handle_success(
     let access_token_request = AccessTokenRequest::new(&context);
     let access_token_response = access_token_request.execute(&code).await?;
 
-    let id_token_verifier = IdTokenVerifier::new(&context);
+    let id_token_verifier = IdTokenVerifier::new(context.secrets.google_auth.client_id.to_owned());
     let claims = id_token_verifier
         .verify(&access_token_response.id_token, &saved_nonce)
         .await?;
