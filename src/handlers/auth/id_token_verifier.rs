@@ -22,9 +22,10 @@ pub(super) struct IdTokenVerifier<'a> {
 
 impl<'a> IdTokenVerifier<'a> {
     pub(super) fn new(context: &'a ApplicationContext) -> Self {
-        let jwks = GoogleJwks::default();
-
-        Self { context, jwks }
+        Self {
+            context,
+            jwks: GoogleJwks,
+        }
     }
 
     pub(super) async fn verify(&self, token: &str, nonce: &str) -> Result<Claims, AuthError> {
