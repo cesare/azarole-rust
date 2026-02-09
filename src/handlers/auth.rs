@@ -87,8 +87,8 @@ async fn handle_success(
         .verify(&access_token_response.id_token, &saved_nonce)
         .await?;
 
-    let finder = UserFinder::new(&context, &claims.sub);
-    let user = finder.execute().await?;
+    let finder = UserFinder::new(&context);
+    let user = finder.execute(&claims.sub).await?;
 
     session.clear();
     session.renew();
