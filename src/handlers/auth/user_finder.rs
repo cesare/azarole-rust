@@ -60,15 +60,15 @@ impl<'a> UserFinder<'a> {
             .await
             .inspect_err(|e| log::error!("Failed to create user: {:?}", e))?;
 
-        sqlx::query(
-            "insert into google_authenticated_users (user_id, uid, created_at) values ($1, $2, $3)",
-        )
-        .bind(user.id)
-        .bind(identifier)
-        .bind(now)
-        .execute(connection)
-        .await
-        .inspect_err(|e| log::error!("Failed to insert google_authenticated_users: {:?}", e))?;
+        let statement =
+            "insert into google_authenticated_users (user_id, uid, created_at) values ($1, $2, $3)";
+        sqlx::query(statement)
+            .bind(user.id)
+            .bind(identifier)
+            .bind(now)
+            .execute(connection)
+            .await
+            .inspect_err(|e| log::error!("Failed to insert google_authenticated_users: {:?}", e))?;
 
         Ok(user)
     }
