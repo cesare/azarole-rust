@@ -1,5 +1,5 @@
 use base64::{Engine, engine::general_purpose::URL_SAFE};
-use rand::{Rng as _, SeedableRng as _, rngs::StdRng};
+use rand::{RngExt, rngs::StdRng};
 use url::Url;
 
 use super::RedirectUri;
@@ -47,7 +47,7 @@ impl<'a> AuthenticationRequestGenerator<'a> {
     }
 
     fn generate_random_string(&self) -> String {
-        let mut rng = StdRng::from_os_rng();
+        let mut rng: StdRng = rand::make_rng();
         let mut bytes = [0u8; 36];
         rng.fill(&mut bytes[..]);
 
