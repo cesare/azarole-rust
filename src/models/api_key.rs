@@ -1,5 +1,5 @@
 use hmac::{Hmac, Mac};
-use rand::{Rng as _, SeedableRng as _, rngs::StdRng};
+use rand::{RngExt, rngs::StdRng};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
 use sqlx::prelude::FromRow;
@@ -26,7 +26,7 @@ pub struct TokenGenerator;
 
 impl TokenGenerator {
     pub fn generate(&self) -> Vec<u8> {
-        let mut rng = StdRng::from_os_rng();
+        let mut rng: StdRng = rand::make_rng();
         let mut bytes = [0u8; 96];
         rng.fill(&mut bytes[..]);
 
