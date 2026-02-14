@@ -7,7 +7,7 @@ use serde_json::json;
 
 use super::views::ApiKeyView;
 use crate::{
-    context::ApplicationContext,
+    context::AppState,
     errors::PerRequestError,
     models::{ApiKeyId, User},
     repositories::RepositoryFactory,
@@ -24,7 +24,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn index(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
 ) -> Result<HttpResponse, PerRequestError> {
     let repository = context.repositories.api_key();
@@ -48,7 +48,7 @@ struct CreatingApiKeyForm {
 }
 
 async fn create(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     form: Form<CreatingApiKeyForm>,
 ) -> Result<HttpResponse, PerRequestError> {
@@ -69,7 +69,7 @@ struct ApiKeyPath {
 }
 
 async fn destroy(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<ApiKeyPath>,
 ) -> Result<HttpResponse, PerRequestError> {

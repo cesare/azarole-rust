@@ -7,7 +7,7 @@ use serde_json::json;
 
 use super::views::WorkplaceView;
 use crate::{
-    context::ApplicationContext, errors::PerRequestError, models::User,
+    context::AppState, errors::PerRequestError, models::User,
     repositories::RepositoryFactory,
 };
 
@@ -18,7 +18,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn index(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
 ) -> Result<HttpResponse, PerRequestError> {
     let repository = context.repositories.workplace();
@@ -37,7 +37,7 @@ struct CreatingWorkplaceForm {
 }
 
 async fn create(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     form: Form<CreatingWorkplaceForm>,
 ) -> Result<HttpResponse, PerRequestError> {

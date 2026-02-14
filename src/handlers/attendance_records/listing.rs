@@ -3,7 +3,7 @@ use chrono_tz::{Asia, Tz};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    context::ApplicationContext,
+    context::AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, Timestamp, Workplace},
     repositories::RepositoryFactory,
@@ -70,14 +70,14 @@ impl TargetMonth {
 }
 
 pub(super) struct AttendancesForMonth<'a> {
-    context: &'a ApplicationContext,
+    context: &'a AppState,
     workplace: &'a Workplace,
     target_month: &'a TargetMonth,
 }
 
 impl<'a> AttendancesForMonth<'a> {
     pub(super) fn new(
-        context: &'a ApplicationContext,
+        context: &'a AppState,
         workplace: &'a Workplace,
         target_month: &'a TargetMonth,
     ) -> Self {

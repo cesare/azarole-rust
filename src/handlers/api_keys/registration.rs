@@ -2,14 +2,14 @@ use base64::{Engine, engine::general_purpose::URL_SAFE};
 use serde::Serialize;
 
 use crate::{
-    context::ApplicationContext,
+    context::AppState,
     errors::DatabaseError,
     models::{ApiKeyId, TokenDigester, TokenGenerator, User},
     repositories::RepositoryFactory,
 };
 
 pub(super) struct ApiKeyRegistration<'a> {
-    context: &'a ApplicationContext,
+    context: &'a AppState,
     user: &'a User,
     name: &'a str,
 }
@@ -22,7 +22,7 @@ pub(super) struct RegistationDetails {
 }
 
 impl<'a> ApiKeyRegistration<'a> {
-    pub(super) fn new(context: &'a ApplicationContext, user: &'a User, name: &'a str) -> Self {
+    pub(super) fn new(context: &'a AppState, user: &'a User, name: &'a str) -> Self {
         Self {
             context,
             user,

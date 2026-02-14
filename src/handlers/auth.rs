@@ -10,7 +10,7 @@ use serde_json::json;
 use thiserror::Error;
 
 use super::views::UserView;
-use crate::{config::ApplicationConfig, context::ApplicationContext, errors::PerRequestError};
+use crate::{config::ApplicationConfig, context::AppState, errors::PerRequestError};
 
 mod access_token_request;
 mod authentication_request;
@@ -29,7 +29,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn request_authentication(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     session: Session,
 ) -> Result<HttpResponse, PerRequestError> {
     let generator = AuthenticationRequestGenerator::new(&context);
@@ -53,7 +53,7 @@ struct CallbackParameters {
 }
 
 async fn callback(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     session: Session,
     params: Form<CallbackParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
@@ -69,7 +69,7 @@ async fn callback(
 }
 
 async fn handle_success(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     session: Session,
     code: String,
     state: String,

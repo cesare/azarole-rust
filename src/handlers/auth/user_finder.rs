@@ -1,14 +1,14 @@
 use chrono::Utc;
 use sqlx::SqliteConnection;
 
-use crate::{context::ApplicationContext, errors::DatabaseError, models::User};
+use crate::{context::AppState, errors::DatabaseError, models::User};
 
 pub(super) struct UserFinder<'a> {
-    context: &'a ApplicationContext,
+    context: &'a AppState,
 }
 
 impl<'a> UserFinder<'a> {
-    pub(super) fn new(context: &'a ApplicationContext) -> Self {
+    pub(super) fn new(context: &'a AppState) -> Self {
         Self { context }
     }
 

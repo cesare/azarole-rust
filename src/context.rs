@@ -39,4 +39,4 @@ impl ApplicationContext {
     }
 }
 
-type AppState = ApplicationContext;
+pub type AppState = ApplicationContext;

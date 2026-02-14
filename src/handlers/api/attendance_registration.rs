@@ -3,18 +3,18 @@ use std::sync::Arc;
 use chrono::Utc;
 
 use crate::{
-    context::ApplicationContext,
+    context::AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, User, WorkplaceId, attendance_record::Event},
     repositories::RepositoryFactory,
 };
 
 pub(super) struct AttendanceRegistration {
-    context: Arc<ApplicationContext>,
+    context: Arc<AppState>,
 }
 
 impl AttendanceRegistration {
-    pub(super) fn new(context: Arc<ApplicationContext>) -> Self {
+    pub(super) fn new(context: Arc<AppState>) -> Self {
         Self { context }
     }
 

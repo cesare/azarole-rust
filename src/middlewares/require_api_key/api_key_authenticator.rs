@@ -1,16 +1,16 @@
 use anyhow::Result;
 
-use crate::context::ApplicationContext;
+use crate::context::AppState;
 use crate::models::{TokenDigester, User};
 use crate::repositories::RepositoryFactory;
 
 pub(super) struct ApiKeyAuthenticator<'a> {
-    context: &'a ApplicationContext,
+    context: &'a AppState,
     token: &'a str,
 }
 
 impl<'a> ApiKeyAuthenticator<'a> {
-    pub(super) fn new(context: &'a ApplicationContext, token: &'a str) -> Self {
+    pub(super) fn new(context: &'a AppState, token: &'a str) -> Self {
         Self { context, token }
     }
 

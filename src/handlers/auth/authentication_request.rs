@@ -3,7 +3,7 @@ use rand::{RngExt, rngs::StdRng};
 use url::Url;
 
 use super::RedirectUri;
-use crate::context::ApplicationContext;
+use crate::context::AppState;
 
 pub(super) struct AuthenticationRequest {
     pub(super) state: String,
@@ -12,11 +12,11 @@ pub(super) struct AuthenticationRequest {
 }
 
 pub(super) struct AuthenticationRequestGenerator<'a> {
-    context: &'a ApplicationContext,
+    context: &'a AppState,
 }
 
 impl<'a> AuthenticationRequestGenerator<'a> {
-    pub(super) fn new(context: &'a ApplicationContext) -> Self {
+    pub(super) fn new(context: &'a AppState) -> Self {
         Self { context }
     }
 

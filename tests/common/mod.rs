@@ -4,7 +4,7 @@ use actix_session::{SessionMiddleware, storage::CookieSessionStore};
 use actix_web::cookie::{Cookie, CookieJar, Key};
 use azarole::{
     config::{AppConfig, ApplicationConfig, DatabaseConfig, FrontendConfig, ServerConfig},
-    context::{ApplicationContext, DatabaseContext},
+    context::{AppState, DatabaseContext},
     repositories::RdbRepositories,
     secrets::{ApikeyConfig, Base64Encoded, GoogleAuthConfig, Secrets, SessionConfig},
 };
@@ -57,13 +57,13 @@ fn create_secrets() -> Secrets {
     }
 }
 
-pub fn create_context(pool: SqlitePool) -> ApplicationContext {
+pub fn create_context(pool: SqlitePool) -> AppState {
     let config = create_config();
     let database = DatabaseContext { pool: pool.clone() };
     let repositories = RdbRepositories::new(pool);
     let secrets = create_secrets();
 
-    ApplicationContext {
+    AppState {
         config,
         database,
         repositories,

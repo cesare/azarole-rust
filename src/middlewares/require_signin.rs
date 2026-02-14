@@ -7,7 +7,7 @@ use actix_web::web::Data;
 use actix_web::{Error, HttpMessage};
 use futures_util::future::{LocalBoxFuture, Ready, ok};
 
-use crate::context::ApplicationContext;
+use crate::context::AppState;
 use crate::errors::DatabaseError;
 use crate::models::{User, UserId};
 use crate::repositories::RepositoryFactory;
@@ -61,7 +61,7 @@ where
             request: &ServiceRequest,
             user_id: UserId,
         ) -> Result<Option<User>, DatabaseError> {
-            let context: &Data<ApplicationContext> = request.app_data().unwrap();
+            let context: &Data<AppState> = request.app_data().unwrap();
             let repository = context.repositories.user();
             repository.find_optional(user_id).await
         }

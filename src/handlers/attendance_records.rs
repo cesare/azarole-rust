@@ -9,7 +9,7 @@ use validator::Validate;
 
 use super::views::{AttendanceRecordView, WorkplaceView};
 use crate::{
-    context::ApplicationContext,
+    context::AppState,
     errors::PerRequestError,
     models::{AttendanceRecordId, User, WorkplaceId, attendance_record},
     repositories::RepositoryFactory,
@@ -39,7 +39,7 @@ struct IndexParameters {
 }
 
 async fn index(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<PathInfo>,
     params: Query<IndexParameters>,
@@ -71,7 +71,7 @@ struct CreationParameters {
 }
 
 async fn create(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<PathInfo>,
     form: Form<CreationParameters>,
@@ -101,7 +101,7 @@ struct DestroyPath {
 }
 
 async fn destroy(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<DestroyPath>,
 ) -> Result<HttpResponse, PerRequestError> {

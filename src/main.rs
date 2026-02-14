@@ -8,7 +8,7 @@ use actix_web::{App, HttpServer};
 use env_logger::Env;
 
 use azarole::config::ApplicationConfig;
-use azarole::context::ApplicationContext;
+use azarole::context::AppState;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
     Cors::default()
@@ -18,7 +18,7 @@ fn build_cors(config: &ApplicationConfig) -> Cors {
         .supports_credentials()
 }
 
-fn build_session_middleware(context: &ApplicationContext) -> SessionMiddleware<CookieSessionStore> {
+fn build_session_middleware(context: &AppState) -> SessionMiddleware<CookieSessionStore> {
     SessionMiddleware::new(
         CookieSessionStore::default(),
         Key::from(&context.secrets.session.session_key),
@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
 
     let args = azarole::args::parse();
     let config = ApplicationConfig::load(&args).await?;
-    let context = ApplicationContext::new(&config)?;
+    let context = AppState::new(&config)?;
     let server_config = config.server.clone();
 
     let server = HttpServer::new(move || {

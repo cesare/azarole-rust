@@ -5,7 +5,7 @@ use actix_web::{HttpResponse, Result};
 use serde_json::json;
 
 use crate::{
-    context::ApplicationContext,
+    context::AppState,
     errors::PerRequestError,
     models::{User, WorkplaceId, attendance_record::Event},
 };
@@ -23,7 +23,7 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn clock_in(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<WorkplaceId>,
 ) -> Result<HttpResponse, PerRequestError> {
@@ -31,7 +31,7 @@ async fn clock_in(
 }
 
 async fn clock_out(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<WorkplaceId>,
 ) -> Result<HttpResponse, PerRequestError> {
@@ -39,7 +39,7 @@ async fn clock_out(
 }
 
 async fn create_clock(
-    context: Data<ApplicationContext>,
+    context: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<WorkplaceId>,
     event: Event,

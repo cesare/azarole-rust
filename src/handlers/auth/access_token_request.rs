@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::{AuthError, RedirectUri};
-use crate::context::ApplicationContext;
+use crate::context::AppState;
 
 #[derive(Serialize)]
 struct Parameters<'a> {
@@ -23,11 +23,11 @@ pub(super) struct AccessTokenResponse {
 }
 
 pub(super) struct AccessTokenRequest<'a> {
-    context: &'a ApplicationContext,
+    context: &'a AppState,
 }
 
 impl<'a> AccessTokenRequest<'a> {
-    pub(super) fn new(context: &'a ApplicationContext) -> Self {
+    pub(super) fn new(context: &'a AppState) -> Self {
         Self { context }
     }
 
