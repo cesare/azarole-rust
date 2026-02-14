@@ -17,14 +17,14 @@ impl DatabaseContext {
 
 #[derive(Clone)]
 #[allow(dead_code)]
-pub struct ApplicationContext {
+pub struct AppState {
     pub config: ApplicationConfig,
     pub database: DatabaseContext,
     pub repositories: RdbRepositories,
     pub secrets: Secrets,
 }
 
-impl ApplicationContext {
+impl AppState {
     pub fn new(config: &ApplicationConfig) -> Result<Self> {
         let database = DatabaseContext::new(config)?;
         let repositories = RdbRepositories::new(database.pool.clone());
@@ -38,5 +38,3 @@ impl ApplicationContext {
         Ok(context)
     }
 }
-
-pub type AppState = ApplicationContext;
