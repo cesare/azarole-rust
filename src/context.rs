@@ -38,3 +38,5 @@ impl ApplicationContext {
         Ok(context)
     }
 }
+
+type AppState = ApplicationContext;
