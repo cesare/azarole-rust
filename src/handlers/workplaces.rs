@@ -18,10 +18,10 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn index(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let repository = context.repositories.workplace();
+    let repository = app_state.repositories.workplace();
     let workplaces = repository.list(&current_user).await?;
 
     let response_json = json!({
@@ -37,11 +37,11 @@ struct CreatingWorkplaceForm {
 }
 
 async fn create(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     form: Form<CreatingWorkplaceForm>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let repository = context.repositories.workplace();
+    let repository = app_state.repositories.workplace();
     let workpalce = repository.create(&current_user, &form.name).await?;
 
     let response_json = json!({

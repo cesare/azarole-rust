@@ -6,11 +6,11 @@ mod common;
 
 #[sqlx::test(fixtures("users", "workplaces"))]
 async fn clock_in_without_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -28,11 +28,11 @@ async fn clock_in_without_api_key(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
 async fn clock_in_with_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -57,11 +57,11 @@ async fn clock_in_with_api_key(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
 async fn clock_in_with_invalid_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -86,11 +86,11 @@ async fn clock_in_with_invalid_api_key(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
 async fn clock_in_on_another_ones_workplace(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -113,11 +113,11 @@ async fn clock_in_on_another_ones_workplace(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces"))]
 async fn clock_out_without_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -135,11 +135,11 @@ async fn clock_out_without_api_key(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
 async fn clock_out_with_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -164,11 +164,11 @@ async fn clock_out_with_api_key(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
 async fn clock_out_with_invalid_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -193,11 +193,11 @@ async fn clock_out_with_invalid_api_key(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "api_keys"))]
 async fn clock_out_on_another_ones_workplace(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;

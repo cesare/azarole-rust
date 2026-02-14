@@ -39,19 +39,19 @@ struct IndexParameters {
 }
 
 async fn index(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<PathInfo>,
     params: Query<IndexParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let workplace = context
+    let workplace = app_state
         .repositories
         .workplace()
         .find(&current_user, path.workplace_id)
         .await?;
 
     let target_month = TargetMonth::new_with_default_timezone(params.year, params.month);
-    let finder = AttendancesForMonth::new(&context, &workplace, &target_month);
+    let finder = AttendancesForMonth::new(&app_state, &workplace, &target_month);
     let attendance_records = finder.execute().await?;
 
     let response_json = json!({
@@ -71,18 +71,18 @@ struct CreationParameters {
 }
 
 async fn create(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<PathInfo>,
     form: Form<CreationParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let workplace = context
+    let workplace = app_state
         .repositories
         .workplace()
         .find(&current_user, path.workplace_id)
         .await?;
 
-    let repository = context.repositories.attendance_record();
+    let repository = app_state.repositories.attendance_record();
     let attendance_record = repository
         .create(&workplace, &form.event, &form.datetime.to_utc().into())
         .await?;
@@ -101,17 +101,17 @@ struct DestroyPath {
 }
 
 async fn destroy(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<DestroyPath>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let workplace = context
+    let workplace = app_state
         .repositories
         .workplace()
         .find(&current_user, path.workplace_id)
         .await?;
 
-    let repository = context.repositories.attendance_record();
+    let repository = app_state.repositories.attendance_record();
     repository.destroy(&workplace, path.id).await?;
 
     let response = HttpResponse::Ok().finish();

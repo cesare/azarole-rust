@@ -70,19 +70,19 @@ impl TargetMonth {
 }
 
 pub(super) struct AttendancesForMonth<'a> {
-    context: &'a AppState,
+    app_state: &'a AppState,
     workplace: &'a Workplace,
     target_month: &'a TargetMonth,
 }
 
 impl<'a> AttendancesForMonth<'a> {
     pub(super) fn new(
-        context: &'a AppState,
+        app_state: &'a AppState,
         workplace: &'a Workplace,
         target_month: &'a TargetMonth,
     ) -> Self {
         Self {
-            context,
+            app_state,
             workplace,
             target_month,
         }
@@ -90,7 +90,7 @@ impl<'a> AttendancesForMonth<'a> {
 
     pub(super) async fn execute(self) -> Result<Vec<AttendanceRecord>, DatabaseError> {
         let (start, end) = self.target_month.datetime_range();
-        let repository = self.context.repositories.attendance_record();
+        let repository = self.app_state.repositories.attendance_record();
         let attendance_records = repository.list(self.workplace, &start, &end).await?;
         Ok(attendance_records)
     }

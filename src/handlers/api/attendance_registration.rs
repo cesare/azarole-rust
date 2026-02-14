@@ -10,12 +10,12 @@ use crate::{
 };
 
 pub(super) struct AttendanceRegistration {
-    context: Arc<AppState>,
+    app_state: Arc<AppState>,
 }
 
 impl AttendanceRegistration {
-    pub(super) fn new(context: Arc<AppState>) -> Self {
-        Self { context }
+    pub(super) fn new(app_state: Arc<AppState>) -> Self {
+        Self { app_state }
     }
 
     pub(super) async fn execute(
@@ -25,12 +25,12 @@ impl AttendanceRegistration {
         event: Event,
     ) -> Result<AttendanceRecord, DatabaseError> {
         let workplace = self
-            .context
+            .app_state
             .repositories
             .workplace()
             .find(user, workplace_id)
             .await?;
-        let repository = self.context.repositories.attendance_record();
+        let repository = self.app_state.repositories.attendance_record();
         repository
             .create(&workplace, &event, &Utc::now().into())
             .await

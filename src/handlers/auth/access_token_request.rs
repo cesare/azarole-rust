@@ -23,21 +23,21 @@ pub(super) struct AccessTokenResponse {
 }
 
 pub(super) struct AccessTokenRequest<'a> {
-    context: &'a AppState,
+    app_state: &'a AppState,
 }
 
 impl<'a> AccessTokenRequest<'a> {
-    pub(super) fn new(context: &'a AppState) -> Self {
-        Self { context }
+    pub(super) fn new(app_state: &'a AppState) -> Self {
+        Self { app_state }
     }
 
     pub(super) async fn execute(&self, code: &str) -> Result<AccessTokenResponse, AuthError> {
         let parameters = Parameters {
-            client_id: &self.context.secrets.google_auth.client_id,
-            client_secret: &self.context.secrets.google_auth.client_secret,
+            client_id: &self.app_state.secrets.google_auth.client_id,
+            client_secret: &self.app_state.secrets.google_auth.client_secret,
             code,
             grant_type: "authorization_code",
-            redirect_uri: &RedirectUri::new(&self.context.config),
+            redirect_uri: &RedirectUri::new(&self.app_state.config),
         };
 
         let client = reqwest::Client::new();

@@ -8,11 +8,11 @@ mod common;
 
 #[sqlx::test(fixtures("users", "api_keys"))]
 async fn listing_api_keys_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -29,11 +29,11 @@ async fn listing_api_keys_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "api_keys"))]
 async fn listing_api_keys(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -75,11 +75,11 @@ struct CreatingApiKeyForm {
 
 #[sqlx::test(fixtures("users"))]
 async fn creating_api_key_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -110,11 +110,11 @@ async fn creating_api_key_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users"))]
 async fn creating_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context.clone()))
+            .app_data(Data::new(app_state.clone()))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -146,18 +146,18 @@ async fn creating_api_key(pool: SqlitePool) {
     assert_eq!(created_key.name, name);
 
     let token = api_key_node.get("token").unwrap().as_str().unwrap();
-    let digester = TokenDigester::new(&context.secrets.api_key.digesting_secret_key);
+    let digester = TokenDigester::new(&app_state.secrets.api_key.digesting_secret_key);
     let expected_digest = digester.digest_token(token).unwrap();
     assert_eq!(created_key.digest, expected_digest);
 }
 
 #[sqlx::test(fixtures("users", "api_keys"))]
 async fn deleting_api_key_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -182,11 +182,11 @@ async fn deleting_api_key_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "api_keys"))]
 async fn deleting_api_key(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;

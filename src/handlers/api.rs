@@ -23,30 +23,30 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn clock_in(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<WorkplaceId>,
 ) -> Result<HttpResponse, PerRequestError> {
-    create_clock(context, current_user, path, Event::ClockIn).await
+    create_clock(app_state, current_user, path, Event::ClockIn).await
 }
 
 async fn clock_out(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<WorkplaceId>,
 ) -> Result<HttpResponse, PerRequestError> {
-    create_clock(context, current_user, path, Event::ClockOut).await
+    create_clock(app_state, current_user, path, Event::ClockOut).await
 }
 
 async fn create_clock(
-    context: Data<AppState>,
+    app_state: Data<AppState>,
     current_user: ReqData<User>,
     path: Path<WorkplaceId>,
     event: Event,
 ) -> Result<HttpResponse, PerRequestError> {
     let workplace_id = path.into_inner();
 
-    let registration = AttendanceRegistration::new(Arc::clone(&context.into_inner()));
+    let registration = AttendanceRegistration::new(Arc::clone(&app_state.into_inner()));
     let attendance_record = registration
         .execute(&current_user, workplace_id, event)
         .await?;

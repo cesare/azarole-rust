@@ -57,7 +57,7 @@ fn create_secrets() -> Secrets {
     }
 }
 
-pub fn create_context(pool: SqlitePool) -> AppState {
+pub fn create_app_state(pool: SqlitePool) -> AppState {
     let config = create_config();
     let database = DatabaseContext { pool: pool.clone() };
     let repositories = RdbRepositories::new(pool);

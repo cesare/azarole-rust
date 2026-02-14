@@ -61,8 +61,8 @@ where
             request: &ServiceRequest,
             user_id: UserId,
         ) -> Result<Option<User>, DatabaseError> {
-            let context: &Data<AppState> = request.app_data().unwrap();
-            let repository = context.repositories.user();
+            let app_state: &Data<AppState> = request.app_data().unwrap();
+            let repository = app_state.repositories.user();
             repository.find_optional(user_id).await
         }
 

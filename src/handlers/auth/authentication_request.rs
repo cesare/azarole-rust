@@ -12,12 +12,12 @@ pub(super) struct AuthenticationRequest {
 }
 
 pub(super) struct AuthenticationRequestGenerator<'a> {
-    context: &'a AppState,
+    app_state: &'a AppState,
 }
 
 impl<'a> AuthenticationRequestGenerator<'a> {
-    pub(super) fn new(context: &'a AppState) -> Self {
-        Self { context }
+    pub(super) fn new(app_state: &'a AppState) -> Self {
+        Self { app_state }
     }
 
     pub(super) fn generate(&self) -> AuthenticationRequest {
@@ -34,8 +34,8 @@ impl<'a> AuthenticationRequestGenerator<'a> {
 
     fn build_request_url(&self, state: &str, nonce: &str) -> String {
         let parameters: &[(&str, &str)] = &[
-            ("client_id", &self.context.secrets.google_auth.client_id),
-            ("redirect_uri", &RedirectUri::new(&self.context.config)),
+            ("client_id", &self.app_state.secrets.google_auth.client_id),
+            ("redirect_uri", &RedirectUri::new(&self.app_state.config)),
             ("response_type", "code"),
             ("scope", "openid email"),
             ("state", state),

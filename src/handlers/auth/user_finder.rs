@@ -4,17 +4,17 @@ use sqlx::SqliteConnection;
 use crate::{context::AppState, errors::DatabaseError, models::User};
 
 pub(super) struct UserFinder<'a> {
-    context: &'a AppState,
+    app_state: &'a AppState,
 }
 
 impl<'a> UserFinder<'a> {
-    pub(super) fn new(context: &'a AppState) -> Self {
-        Self { context }
+    pub(super) fn new(app_state: &'a AppState) -> Self {
+        Self { app_state }
     }
 
     pub(super) async fn execute(self, identifier: &str) -> Result<User, DatabaseError> {
         let mut tx = self
-            .context
+            .app_state
             .database
             .pool
             .begin()
