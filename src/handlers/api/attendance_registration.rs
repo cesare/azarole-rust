@@ -3,7 +3,7 @@ use std::sync::Arc;
 use chrono::Utc;
 
 use crate::{
-    context::AppState,
+    AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, User, WorkplaceId, attendance_record::Event},
     repositories::RepositoryFactory,

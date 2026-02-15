@@ -5,7 +5,7 @@ use actix_web::{HttpResponse, Result};
 use serde_json::json;
 
 use crate::{
-    context::AppState,
+    AppState,
     errors::PerRequestError,
     models::{User, WorkplaceId, attendance_record::Event},
 };

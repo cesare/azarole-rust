@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::{AuthError, RedirectUri};
-use crate::context::AppState;
+use crate::AppState;
 
 #[derive(Serialize)]
 struct Parameters<'a> {

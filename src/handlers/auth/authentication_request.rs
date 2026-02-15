@@ -3,7 +3,7 @@ use rand::{RngExt, rngs::StdRng};
 use url::Url;
 
 use super::RedirectUri;
-use crate::context::AppState;
+use crate::AppState;
 
 pub(super) struct AuthenticationRequest {
     pub(super) state: String,

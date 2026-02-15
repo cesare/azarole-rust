@@ -9,7 +9,7 @@ use futures_util::future::{LocalBoxFuture, Ready, ok};
 
 mod api_key_authenticator;
 
-use crate::context::AppState;
+use crate::AppState;
 use api_key_authenticator::ApiKeyAuthenticator;
 
 pub struct RequireApiKey;

@@ -2,7 +2,7 @@ use base64::{Engine, engine::general_purpose::URL_SAFE};
 use serde::Serialize;
 
 use crate::{
-    context::AppState,
+    AppState,
     errors::DatabaseError,
     models::{ApiKeyId, TokenDigester, TokenGenerator, User},
     repositories::RepositoryFactory,

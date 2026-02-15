@@ -7,7 +7,7 @@ use actix_web::web::Data;
 use actix_web::{Error, HttpMessage};
 use futures_util::future::{LocalBoxFuture, Ready, ok};
 
-use crate::context::AppState;
+use crate::AppState;
 use crate::errors::DatabaseError;
 use crate::models::{User, UserId};
 use crate::repositories::RepositoryFactory;

@@ -10,7 +10,7 @@ use serde_json::json;
 use thiserror::Error;
 
 use super::views::UserView;
-use crate::{config::ApplicationConfig, context::AppState, errors::PerRequestError};
+use crate::{config::ApplicationConfig, AppState, errors::PerRequestError};
 
 mod access_token_request;
 mod authentication_request;

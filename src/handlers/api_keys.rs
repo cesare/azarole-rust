@@ -7,7 +7,7 @@ use serde_json::json;
 
 use super::views::ApiKeyView;
 use crate::{
-    context::AppState,
+    AppState,
     errors::PerRequestError,
     models::{ApiKeyId, User},
     repositories::RepositoryFactory,

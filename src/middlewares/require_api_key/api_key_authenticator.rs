@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::context::AppState;
+use crate::AppState;
 use crate::models::{TokenDigester, User};
 use crate::repositories::RepositoryFactory;
 

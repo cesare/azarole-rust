@@ -7,3 +7,5 @@ mod middlewares;
 pub mod models;
 pub mod repositories;
 pub mod secrets;
+
+pub use context::AppState;

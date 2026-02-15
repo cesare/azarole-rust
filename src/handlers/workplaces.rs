@@ -7,7 +7,7 @@ use serde_json::json;
 
 use super::views::WorkplaceView;
 use crate::{
-    context::AppState, errors::PerRequestError, models::User, repositories::RepositoryFactory,
+    AppState, errors::PerRequestError, models::User, repositories::RepositoryFactory,
 };
 
 pub(super) fn routes(config: &mut ServiceConfig) {

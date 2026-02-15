@@ -9,7 +9,7 @@ use validator::Validate;
 
 use super::views::{AttendanceRecordView, WorkplaceView};
 use crate::{
-    context::AppState,
+    AppState,
     errors::PerRequestError,
     models::{AttendanceRecordId, User, WorkplaceId, attendance_record},
     repositories::RepositoryFactory,
