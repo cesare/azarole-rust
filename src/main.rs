@@ -7,8 +7,8 @@ use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use env_logger::Env;
 
-use azarole::config::ApplicationConfig;
 use azarole::AppState;
+use azarole::config::ApplicationConfig;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
     Cors::default()
