@@ -6,11 +6,11 @@ mod common;
 
 #[sqlx::test(fixtures("users"))]
 async fn current_user_without_signing_in(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -27,11 +27,11 @@ async fn current_user_without_signing_in(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users"))]
 async fn current_user_with_signing_in(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;

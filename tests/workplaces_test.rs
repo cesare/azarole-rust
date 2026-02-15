@@ -8,11 +8,11 @@ mod common;
 
 #[sqlx::test(fixtures("users"))]
 async fn workplace_listing_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -29,11 +29,11 @@ async fn workplace_listing_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces"))]
 async fn workplace_listing(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -65,11 +65,11 @@ async fn workplace_listing(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users"))]
 async fn workplace_creation_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -96,11 +96,11 @@ async fn workplace_creation_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users"))]
 async fn workplace_creation(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context.clone()))
+            .app_data(Data::new(app_state.clone()))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -132,7 +132,7 @@ async fn workplace_creation(pool: SqlitePool) {
     assert_eq!(response_json, expected_json);
 
     let user = User { id: 1.into() };
-    let repository = context.repositories.workplace();
+    let repository = app_state.repositories.workplace();
     let workplaces = repository.list(&user).await.unwrap();
     assert_eq!(workplaces.iter().count(), 1);
 

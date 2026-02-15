@@ -10,7 +10,7 @@ use serde_json::json;
 use thiserror::Error;
 
 use super::views::UserView;
-use crate::{config::ApplicationConfig, context::ApplicationContext, errors::PerRequestError};
+use crate::{AppState, config::ApplicationConfig, errors::PerRequestError};
 
 mod access_token_request;
 mod authentication_request;
@@ -29,10 +29,10 @@ pub(super) fn routes(config: &mut ServiceConfig) {
 }
 
 async fn request_authentication(
-    context: Data<ApplicationContext>,
+    app_state: Data<AppState>,
     session: Session,
 ) -> Result<HttpResponse, PerRequestError> {
-    let generator = AuthenticationRequestGenerator::new(&context);
+    let generator = AuthenticationRequestGenerator::new(&app_state);
     let authentication_request = generator.generate();
 
     session.insert("google-auth-state", &authentication_request.state)?;
@@ -53,7 +53,7 @@ struct CallbackParameters {
 }
 
 async fn callback(
-    context: Data<ApplicationContext>,
+    app_state: Data<AppState>,
     session: Session,
     params: Form<CallbackParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
@@ -63,13 +63,13 @@ async fn callback(
             code: Some(code),
             state: Some(state),
             error: None,
-        } => handle_success(context, session, code, state).await,
+        } => handle_success(app_state, session, code, state).await,
         _ => handle_failure(session).await,
     }
 }
 
 async fn handle_success(
-    context: Data<ApplicationContext>,
+    app_state: Data<AppState>,
     session: Session,
     code: String,
     state: String,
@@ -80,14 +80,14 @@ async fn handle_success(
         return Err(PerRequestError::Unauthorized);
     }
 
-    let access_token_request = AccessTokenRequest::new(&context);
+    let access_token_request = AccessTokenRequest::new(&app_state);
     let access_token_response = access_token_request.execute(&code).await?;
 
-    let claims = IdTokenVerifier::new(context.secrets.google_auth.client_id.to_owned())
+    let claims = IdTokenVerifier::new(app_state.secrets.google_auth.client_id.to_owned())
         .verify(&access_token_response.id_token, &saved_nonce)
         .await?;
 
-    let finder = UserFinder::new(&context);
+    let finder = UserFinder::new(&app_state);
     let user = finder.execute(&claims.sub).await?;
 
     session.clear();

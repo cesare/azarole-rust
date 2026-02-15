@@ -3,7 +3,7 @@ use chrono_tz::{Asia, Tz};
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    context::ApplicationContext,
+    AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, Timestamp, Workplace},
     repositories::RepositoryFactory,
@@ -70,19 +70,19 @@ impl TargetMonth {
 }
 
 pub(super) struct AttendancesForMonth<'a> {
-    context: &'a ApplicationContext,
+    app_state: &'a AppState,
     workplace: &'a Workplace,
     target_month: &'a TargetMonth,
 }
 
 impl<'a> AttendancesForMonth<'a> {
     pub(super) fn new(
-        context: &'a ApplicationContext,
+        app_state: &'a AppState,
         workplace: &'a Workplace,
         target_month: &'a TargetMonth,
     ) -> Self {
         Self {
-            context,
+            app_state,
             workplace,
             target_month,
         }
@@ -90,7 +90,7 @@ impl<'a> AttendancesForMonth<'a> {
 
     pub(super) async fn execute(self) -> Result<Vec<AttendanceRecord>, DatabaseError> {
         let (start, end) = self.target_month.datetime_range();
-        let repository = self.context.repositories.attendance_record();
+        let repository = self.app_state.repositories.attendance_record();
         let attendance_records = repository.list(self.workplace, &start, &end).await?;
         Ok(attendance_records)
     }

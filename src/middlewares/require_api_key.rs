@@ -9,7 +9,7 @@ use futures_util::future::{LocalBoxFuture, Ready, ok};
 
 mod api_key_authenticator;
 
-use crate::context::ApplicationContext;
+use crate::AppState;
 use api_key_authenticator::ApiKeyAuthenticator;
 
 pub struct RequireApiKey;
@@ -60,12 +60,12 @@ where
         let service = Rc::clone(&self.service);
 
         Box::pin(async move {
-            let context: &Data<ApplicationContext> = req.app_data().unwrap();
+            let app_state: &Data<AppState> = req.app_data().unwrap();
 
             let bearer_auth = BearerAuth::extract(req.request()).await?;
             let token = bearer_auth.token();
 
-            let authenticator = ApiKeyAuthenticator::new(context, token);
+            let authenticator = ApiKeyAuthenticator::new(app_state, token);
             let result = authenticator.authenticate().await;
             match result {
                 Ok(Some(user)) => {

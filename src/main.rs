@@ -7,8 +7,8 @@ use actix_web::web::Data;
 use actix_web::{App, HttpServer};
 use env_logger::Env;
 
+use azarole::AppState;
 use azarole::config::ApplicationConfig;
-use azarole::context::ApplicationContext;
 
 fn build_cors(config: &ApplicationConfig) -> Cors {
     Cors::default()
@@ -18,10 +18,10 @@ fn build_cors(config: &ApplicationConfig) -> Cors {
         .supports_credentials()
 }
 
-fn build_session_middleware(context: &ApplicationContext) -> SessionMiddleware<CookieSessionStore> {
+fn build_session_middleware(app_state: &AppState) -> SessionMiddleware<CookieSessionStore> {
     SessionMiddleware::new(
         CookieSessionStore::default(),
-        Key::from(&context.secrets.session.session_key),
+        Key::from(&app_state.secrets.session.session_key),
     )
 }
 
@@ -31,7 +31,7 @@ async fn main() -> anyhow::Result<()> {
 
     let args = azarole::args::parse();
     let config = ApplicationConfig::load(&args).await?;
-    let context = ApplicationContext::new(&config)?;
+    let app_state = AppState::new(&config)?;
     let server_config = config.server.clone();
 
     let server = HttpServer::new(move || {
@@ -40,8 +40,8 @@ async fn main() -> anyhow::Result<()> {
                 "%a %t \"%r\" %s %b \"%{Referer}i\" \"%{User-Agent}i\" %T",
             ))
             .wrap(build_cors(&config))
-            .wrap(build_session_middleware(&context))
-            .app_data(Data::new(context.clone()))
+            .wrap(build_session_middleware(&app_state))
+            .app_data(Data::new(app_state.clone()))
             .configure(azarole::handlers::routes)
     });
     server

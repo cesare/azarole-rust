@@ -1,20 +1,20 @@
 use chrono::Utc;
 use sqlx::SqliteConnection;
 
-use crate::{context::ApplicationContext, errors::DatabaseError, models::User};
+use crate::{AppState, errors::DatabaseError, models::User};
 
 pub(super) struct UserFinder<'a> {
-    context: &'a ApplicationContext,
+    app_state: &'a AppState,
 }
 
 impl<'a> UserFinder<'a> {
-    pub(super) fn new(context: &'a ApplicationContext) -> Self {
-        Self { context }
+    pub(super) fn new(app_state: &'a AppState) -> Self {
+        Self { app_state }
     }
 
     pub(super) async fn execute(self, identifier: &str) -> Result<User, DatabaseError> {
         let mut tx = self
-            .context
+            .app_state
             .database
             .pool
             .begin()

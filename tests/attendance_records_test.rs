@@ -15,11 +15,11 @@ struct CreationParams {
 
 #[sqlx::test(fixtures("users"))]
 async fn attendance_record_creation_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool);
+    let app_state = common::create_app_state(pool);
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -42,11 +42,11 @@ async fn attendance_record_creation_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces"))]
 async fn attendance_record_creation(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -88,11 +88,11 @@ async fn attendance_record_creation(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces"))]
 async fn attendance_record_creation_with_other_user(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -120,11 +120,11 @@ async fn attendance_record_creation_with_other_user(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "attendance_records"))]
 async fn attendance_record_deletion_without_signin(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -152,11 +152,11 @@ async fn attendance_record_deletion_without_signin(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "attendance_records"))]
 async fn attendance_record_deletion(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;
@@ -182,11 +182,11 @@ async fn attendance_record_deletion(pool: SqlitePool) {
 
 #[sqlx::test(fixtures("users", "workplaces", "attendance_records"))]
 async fn attendance_record_deletion_with_other_user(pool: SqlitePool) {
-    let context = common::create_context(pool.clone());
+    let app_state = common::create_app_state(pool.clone());
     let app = test::init_service(
         App::new()
             .wrap(common::create_session_middleware())
-            .app_data(Data::new(context))
+            .app_data(Data::new(app_state))
             .configure(azarole::handlers::routes),
     )
     .await;

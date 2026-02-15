@@ -2,14 +2,14 @@ use base64::{Engine, engine::general_purpose::URL_SAFE};
 use serde::Serialize;
 
 use crate::{
-    context::ApplicationContext,
+    AppState,
     errors::DatabaseError,
     models::{ApiKeyId, TokenDigester, TokenGenerator, User},
     repositories::RepositoryFactory,
 };
 
 pub(super) struct ApiKeyRegistration<'a> {
-    context: &'a ApplicationContext,
+    app_state: &'a AppState,
     user: &'a User,
     name: &'a str,
 }
@@ -22,9 +22,9 @@ pub(super) struct RegistationDetails {
 }
 
 impl<'a> ApiKeyRegistration<'a> {
-    pub(super) fn new(context: &'a ApplicationContext, user: &'a User, name: &'a str) -> Self {
+    pub(super) fn new(app_state: &'a AppState, user: &'a User, name: &'a str) -> Self {
         Self {
-            context,
+            app_state,
             user,
             name,
         }
@@ -34,7 +34,7 @@ impl<'a> ApiKeyRegistration<'a> {
         let token = self.generate_token();
         let digest = self.digest_token(&token);
 
-        let repository = self.context.repositories.api_key();
+        let repository = self.app_state.repositories.api_key();
         let api_key = repository.create(self.user, self.name, &digest).await?;
 
         let details = RegistationDetails {
@@ -51,7 +51,7 @@ impl<'a> ApiKeyRegistration<'a> {
     }
 
     fn digest_token(&self, token: &str) -> String {
-        let digester = TokenDigester::new(&self.context.secrets.api_key.digesting_secret_key);
+        let digester = TokenDigester::new(&self.app_state.secrets.api_key.digesting_secret_key);
         digester.digest_token(token).unwrap()
     }
 }
