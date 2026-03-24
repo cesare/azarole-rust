@@ -22,7 +22,7 @@ base64 = "0.22.1"
 clap = { version = "4.6.0", features = ["derive"] }
 chrono = { version = "0.4.44", features = ["serde"] }
 chrono-tz = "0.10.4"
-env_logger = "0.11.9"
+env_logger = "0.11.10"
 envy = "0.4.2"
 futures-util = "0.3.32"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
