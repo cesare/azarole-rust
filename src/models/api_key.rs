@@ -1,4 +1,4 @@
-use hmac::{Hmac, Mac};
+use hmac::{Hmac, KeyInit, Mac};
 use rand::{RngExt, rngs::StdRng};
 use serde::{Deserialize, Serialize};
 use sha2::Sha256;
@@ -46,7 +46,8 @@ impl TokenDigester {
     }
 
     pub fn digest_token(&self, token: &str) -> anyhow::Result<String> {
-        let mut mac = Hmac::<Sha256>::new_from_slice(&self.secret_key)
+        type HmacSha256 = Hmac<Sha256>;
+        let mut mac = HmacSha256::new_from_slice(&self.secret_key)
             .inspect_err(|e| log::error!("Failed to prepare Hmac object: {:?}", e))?;
 
         mac.update(token.as_bytes());
