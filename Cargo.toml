@@ -27,7 +27,7 @@ envy = "0.4.2"
 futures-util = "0.3.32"
 jsonwebtoken = { version = "10.3.0", features = ["rust_crypto"] }
 hex = "0.4.3"
-hmac = "0.13.0-rc.6"
+hmac = "0.13.0"
 log = "0.4.29"
 rand = "0.10.0"
 reqwest = { version = "0.13.2", features = ["form", "json"] }
