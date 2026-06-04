@@ -28,7 +28,7 @@ futures-util = "0.3.32"
 jsonwebtoken = { version = "10.4.0", features = ["rust_crypto"] }
 hex = "0.4.3"
 hmac = "0.13.0"
-log = "0.4.31"
+log = "0.4.32"
 rand = "0.10.1"
 reqwest = { version = "0.13.4", features = ["form", "json"] }
 serde = "1.0.228"
