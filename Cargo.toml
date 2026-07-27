@@ -40,4 +40,4 @@ thiserror = "2.0.18"
 tokio = { version = "1.52.3", features = ["fs", "macros", "rt-multi-thread"] }
 toml = "1.1.2"
 url = "2.5.8"
-validator = { version = "0.20.0", features = ["derive"] }
+validator = { version = "0.21.0", features = ["derive"] }
