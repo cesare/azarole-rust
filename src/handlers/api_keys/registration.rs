@@ -5,7 +5,7 @@ use crate::{
     AppState,
     errors::DatabaseError,
     models::{ApiKeyId, TokenDigester, TokenGenerator, User},
-    repositories::RepositoryFactory,
+    repositories::{ApiKeyRepository, RepositoryFactory},
 };
 
 pub(super) struct ApiKeyRegistration<'a> {

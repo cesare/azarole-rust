@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::AppState;
 use crate::models::{TokenDigester, User};
-use crate::repositories::RepositoryFactory;
+use crate::repositories::{ApiKeyRepository, RepositoryFactory};
 
 pub(super) struct ApiKeyAuthenticator<'a> {
     app_state: &'a AppState,

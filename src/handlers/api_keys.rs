@@ -10,7 +10,7 @@ use crate::{
     AppState,
     errors::PerRequestError,
     models::{ApiKeyId, User},
-    repositories::RepositoryFactory,
+    repositories::{ApiKeyRepository, RepositoryFactory},
 };
 
 mod registration;

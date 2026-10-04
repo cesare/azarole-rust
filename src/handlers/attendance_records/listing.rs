@@ -6,7 +6,7 @@ use crate::{
     AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, Timestamp, Workplace},
-    repositories::RepositoryFactory,
+    repositories::{AttendanceRecordRepository, RepositoryFactory},
 };
 
 #[derive(Clone, Copy, Deserialize, Serialize)]

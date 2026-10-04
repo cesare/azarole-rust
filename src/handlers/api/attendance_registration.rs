@@ -6,7 +6,7 @@ use crate::{
     AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, User, WorkplaceId, attendance_record::Event},
-    repositories::RepositoryFactory,
+    repositories::{AttendanceRecordRepository, RepositoryFactory, WorkplaceRepository},
 };
 
 pub(super) struct AttendanceRegistration {

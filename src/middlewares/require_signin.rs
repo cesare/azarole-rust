@@ -10,7 +10,7 @@ use futures_util::future::{LocalBoxFuture, Ready, ok};
 use crate::AppState;
 use crate::errors::DatabaseError;
 use crate::models::{User, UserId};
-use crate::repositories::RepositoryFactory;
+use crate::repositories::{RepositoryFactory, UserRepository};
 
 pub struct RequireSignin;
 

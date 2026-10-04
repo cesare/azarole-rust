@@ -1,5 +1,8 @@
 use actix_web::{App, http::StatusCode, test, web::Data};
-use azarole::{models::User, repositories::RepositoryFactory};
+use azarole::{
+    models::User,
+    repositories::{RepositoryFactory, WorkplaceRepository},
+};
 use serde::Serialize;
 use serde_json::{Value, json};
 use sqlx::SqlitePool;

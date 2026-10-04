@@ -12,7 +12,7 @@ use crate::{
     AppState,
     errors::PerRequestError,
     models::{AttendanceRecordId, User, WorkplaceId, attendance_record},
-    repositories::RepositoryFactory,
+    repositories::{AttendanceRecordRepository, RepositoryFactory, WorkplaceRepository},
 };
 
 mod listing;
