@@ -12,7 +12,7 @@ use crate::{
     AppState,
     errors::PerRequestError,
     models::{AttendanceRecordId, User, WorkplaceId, attendance_record},
-    repositories::RepositoryFactory,
+    repositories::{AttendanceRecordRepository, Repository, WorkplaceRepository},
 };
 
 mod listing;
@@ -45,7 +45,7 @@ async fn index(
     params: Query<IndexParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
     let workplace = app_state
-        .repositories
+        .repository
         .workplace()
         .find(&current_user, path.workplace_id)
         .await?;
@@ -77,12 +77,12 @@ async fn create(
     form: Form<CreationParameters>,
 ) -> Result<HttpResponse, PerRequestError> {
     let workplace = app_state
-        .repositories
+        .repository
         .workplace()
         .find(&current_user, path.workplace_id)
         .await?;
 
-    let repository = app_state.repositories.attendance_record();
+    let repository = app_state.repository.attendance_record();
     let attendance_record = repository
         .create(&workplace, &form.event, &form.datetime.to_utc().into())
         .await?;
@@ -106,12 +106,12 @@ async fn destroy(
     path: Path<DestroyPath>,
 ) -> Result<HttpResponse, PerRequestError> {
     let workplace = app_state
-        .repositories
+        .repository
         .workplace()
         .find(&current_user, path.workplace_id)
         .await?;
 
-    let repository = app_state.repositories.attendance_record();
+    let repository = app_state.repository.attendance_record();
     repository.destroy(&workplace, path.id).await?;
 
     let response = HttpResponse::Ok().finish();

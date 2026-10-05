@@ -1,5 +1,8 @@
 use actix_web::{App, http::StatusCode, test, web::Data};
-use azarole::{models::User, repositories::RepositoryFactory};
+use azarole::{
+    models::User,
+    repositories::{Repository, WorkplaceRepository},
+};
 use serde::Serialize;
 use serde_json::{Value, json};
 use sqlx::SqlitePool;
@@ -132,7 +135,7 @@ async fn workplace_creation(pool: SqlitePool) {
     assert_eq!(response_json, expected_json);
 
     let user = User { id: 1.into() };
-    let repository = app_state.repositories.workplace();
+    let repository = app_state.repository.workplace();
     let workplaces = repository.list(&user).await.unwrap();
     assert_eq!(workplaces.iter().count(), 1);
 

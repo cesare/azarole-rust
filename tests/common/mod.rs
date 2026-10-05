@@ -6,7 +6,7 @@ use azarole::{
     AppState,
     config::{AppConfig, ApplicationConfig, DatabaseConfig, FrontendConfig, ServerConfig},
     context::DatabaseContext,
-    repositories::RdbRepositories,
+    repositories::RdbRepository,
     secrets::{ApikeyConfig, Base64Encoded, GoogleAuthConfig, Secrets, SessionConfig},
 };
 use base64::{Engine as _, engine::general_purpose::URL_SAFE};
@@ -61,13 +61,13 @@ fn create_secrets() -> Secrets {
 pub fn create_app_state(pool: SqlitePool) -> AppState {
     let config = create_config();
     let database = DatabaseContext { pool: pool.clone() };
-    let repositories = RdbRepositories::new(pool);
+    let repository = RdbRepository::new(pool);
     let secrets = create_secrets();
 
     AppState {
         config,
         database,
-        repositories,
+        repository,
         secrets,
     }
 }

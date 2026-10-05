@@ -59,38 +59,48 @@ pub trait WorkplaceRepository {
     async fn find(&self, user: &User, id: WorkplaceId) -> Result<Workplace, DatabaseError>;
 }
 
-pub trait RepositoryFactory {
-    fn api_key(&self) -> Box<dyn ApiKeyRepository + '_>;
-    fn attendance_record(&self) -> Box<dyn AttendanceRecordRepository + '_>;
-    fn user(&self) -> Box<dyn UserRepository + '_>;
-    fn workplace(&self) -> Box<dyn WorkplaceRepository + '_>;
+pub trait Repository<'r> {
+    type ApiKeyRepository: ApiKeyRepository;
+    type AttendanceRecordRepository: AttendanceRecordRepository;
+    type UserRepository: UserRepository;
+    type WorkplaceRepository: WorkplaceRepository;
+
+    fn api_key(&'r self) -> Self::ApiKeyRepository;
+    fn attendance_record(&'r self) -> Self::AttendanceRecordRepository;
+    fn user(&'r self) -> Self::UserRepository;
+    fn workplace(&'r self) -> Self::WorkplaceRepository;
 }
 
 #[derive(Clone)]
-pub struct RdbRepositories {
+pub struct RdbRepository {
     pool: Pool<Sqlite>,
 }
 
-impl RdbRepositories {
+impl RdbRepository {
     pub fn new(pool: Pool<Sqlite>) -> Self {
         Self { pool }
     }
 }
 
-impl RepositoryFactory for RdbRepositories {
-    fn api_key(&self) -> Box<dyn ApiKeyRepository + '_> {
-        Box::new(RdbApiKeyRepository::new(&self.pool))
+impl<'r> Repository<'r> for RdbRepository {
+    type ApiKeyRepository = RdbApiKeyRepository<'r>;
+    type AttendanceRecordRepository = RdbAttendanceRecordRepository<'r>;
+    type UserRepository = RdbUserRepository<'r>;
+    type WorkplaceRepository = RdbWorkplaceRepository<'r>;
+
+    fn api_key(&'r self) -> Self::ApiKeyRepository {
+        RdbApiKeyRepository::new(&self.pool)
     }
 
-    fn attendance_record(&self) -> Box<dyn AttendanceRecordRepository + '_> {
-        Box::new(RdbAttendanceRecordRepository::new(&self.pool))
+    fn attendance_record(&'r self) -> Self::AttendanceRecordRepository {
+        RdbAttendanceRecordRepository::new(&self.pool)
     }
 
-    fn user(&self) -> Box<dyn UserRepository + '_> {
-        Box::new(RdbUserRepository::new(&self.pool))
+    fn user(&'r self) -> Self::UserRepository {
+        RdbUserRepository::new(&self.pool)
     }
 
-    fn workplace(&self) -> Box<dyn WorkplaceRepository + '_> {
-        Box::new(RdbWorkplaceRepository::new(&self.pool))
+    fn workplace(&'r self) -> Self::WorkplaceRepository {
+        RdbWorkplaceRepository::new(&self.pool)
     }
 }

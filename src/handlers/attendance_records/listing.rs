@@ -6,7 +6,7 @@ use crate::{
     AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, Timestamp, Workplace},
-    repositories::RepositoryFactory,
+    repositories::{AttendanceRecordRepository, Repository},
 };
 
 #[derive(Clone, Copy, Deserialize, Serialize)]
@@ -90,7 +90,7 @@ impl<'a> AttendancesForMonth<'a> {
 
     pub(super) async fn execute(self) -> Result<Vec<AttendanceRecord>, DatabaseError> {
         let (start, end) = self.target_month.datetime_range();
-        let repository = self.app_state.repositories.attendance_record();
+        let repository = self.app_state.repository.attendance_record();
         let attendance_records = repository.list(self.workplace, &start, &end).await?;
         Ok(attendance_records)
     }

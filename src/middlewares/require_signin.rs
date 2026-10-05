@@ -10,7 +10,7 @@ use futures_util::future::{LocalBoxFuture, Ready, ok};
 use crate::AppState;
 use crate::errors::DatabaseError;
 use crate::models::{User, UserId};
-use crate::repositories::RepositoryFactory;
+use crate::repositories::{Repository, UserRepository};
 
 pub struct RequireSignin;
 
@@ -62,7 +62,7 @@ where
             user_id: UserId,
         ) -> Result<Option<User>, DatabaseError> {
             let app_state: &Data<AppState> = request.app_data().unwrap();
-            let repository = app_state.repositories.user();
+            let repository = app_state.repository.user();
             repository.find_optional(user_id).await
         }
 

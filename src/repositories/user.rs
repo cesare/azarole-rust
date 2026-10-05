@@ -1,7 +1,5 @@
-use std::marker::PhantomData;
-
 use async_trait::async_trait;
-use sqlx::{Executor, Sqlite};
+use sqlx::{Executor, Pool, Sqlite};
 
 use crate::{
     errors::DatabaseError,
@@ -10,33 +8,30 @@ use crate::{
 
 use super::UserRepository;
 
-pub struct RdbUserRepository<'a, T: Executor<'a>> {
-    executor: T,
-    _marker: PhantomData<&'a T>,
+pub struct RdbUserRepository<'r> {
+    pool: &'r Pool<Sqlite>,
 }
 
-impl<'a, T> RdbUserRepository<'a, T>
-where
-    T: Executor<'a, Database = Sqlite> + Copy + Sync,
-{
-    pub fn new(executor: T) -> Self {
-        Self {
-            executor,
-            _marker: PhantomData,
-        }
+impl<'r> RdbUserRepository<'r> {
+    pub fn new(pool: &'r Pool<Sqlite>) -> Self {
+        Self { pool }
     }
 }
 
 #[async_trait]
-impl<'a, T> UserRepository for RdbUserRepository<'a, T>
-where
-    T: Executor<'a, Database = Sqlite> + Copy + Sync,
-{
+impl<'r> UserRepository for RdbUserRepository<'r> {
     async fn find_optional(&self, id: UserId) -> Result<Option<User>, DatabaseError> {
-        let result: Option<User> = sqlx::query_as("select id from users where id = $1")
-            .bind(id)
-            .fetch_optional(self.executor)
-            .await?;
-        Ok(result)
+        find_optional(self.pool, id).await
     }
+}
+
+async fn find_optional<'c, T>(executor: T, id: UserId) -> Result<Option<User>, DatabaseError>
+where
+    T: Executor<'c, Database = Sqlite>,
+{
+    let result: Option<User> = sqlx::query_as("select id from users where id = $1")
+        .bind(id)
+        .fetch_optional(executor)
+        .await?;
+    Ok(result)
 }

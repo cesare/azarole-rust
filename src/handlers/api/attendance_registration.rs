@@ -6,7 +6,7 @@ use crate::{
     AppState,
     errors::DatabaseError,
     models::{AttendanceRecord, User, WorkplaceId, attendance_record::Event},
-    repositories::RepositoryFactory,
+    repositories::{AttendanceRecordRepository, Repository, WorkplaceRepository},
 };
 
 pub(super) struct AttendanceRegistration {
@@ -26,11 +26,11 @@ impl AttendanceRegistration {
     ) -> Result<AttendanceRecord, DatabaseError> {
         let workplace = self
             .app_state
-            .repositories
+            .repository
             .workplace()
             .find(user, workplace_id)
             .await?;
-        let repository = self.app_state.repositories.attendance_record();
+        let repository = self.app_state.repository.attendance_record();
         repository
             .create(&workplace, &event, &Utc::now().into())
             .await

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use sqlx::{Pool, Sqlite, sqlite::SqlitePoolOptions};
 
-use crate::{config::ApplicationConfig, repositories::RdbRepositories, secrets::Secrets};
+use crate::{config::ApplicationConfig, repositories::RdbRepository, secrets::Secrets};
 
 #[derive(Clone)]
 pub struct DatabaseContext {
@@ -20,18 +20,18 @@ impl DatabaseContext {
 pub struct AppState {
     pub config: ApplicationConfig,
     pub database: DatabaseContext,
-    pub repositories: RdbRepositories,
+    pub repository: RdbRepository,
     pub secrets: Secrets,
 }
 
 impl AppState {
     pub fn new(config: &ApplicationConfig) -> Result<Self> {
         let database = DatabaseContext::new(config)?;
-        let repositories = RdbRepositories::new(database.pool.clone());
+        let repository = RdbRepository::new(database.pool.clone());
         let secrets = Secrets::load()?;
         let app_state = Self {
             config: config.clone(),
-            repositories,
+            repository,
             secrets,
             database,
         };
