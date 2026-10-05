@@ -59,7 +59,7 @@ pub trait WorkplaceRepository {
     async fn find(&self, user: &User, id: WorkplaceId) -> Result<Workplace, DatabaseError>;
 }
 
-pub trait RepositoryFactory<'r> {
+pub trait Repository<'r> {
     type ApiKeyRepository: ApiKeyRepository;
     type AttendanceRecordRepository: AttendanceRecordRepository;
     type UserRepository: UserRepository;
@@ -72,17 +72,17 @@ pub trait RepositoryFactory<'r> {
 }
 
 #[derive(Clone)]
-pub struct RdbRepositories {
+pub struct RdbRepository {
     pool: Pool<Sqlite>,
 }
 
-impl RdbRepositories {
+impl RdbRepository {
     pub fn new(pool: Pool<Sqlite>) -> Self {
         Self { pool }
     }
 }
 
-impl<'r> RepositoryFactory<'r> for RdbRepositories {
+impl<'r> Repository<'r> for RdbRepository {
     type ApiKeyRepository = RdbApiKeyRepository<'r>;
     type AttendanceRecordRepository = RdbAttendanceRecordRepository<'r>;
     type UserRepository = RdbUserRepository<'r>;

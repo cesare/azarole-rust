@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::AppState;
 use crate::models::{TokenDigester, User};
-use crate::repositories::{ApiKeyRepository, RepositoryFactory};
+use crate::repositories::{ApiKeyRepository, Repository};
 
 pub(super) struct ApiKeyAuthenticator<'a> {
     app_state: &'a AppState,
@@ -16,7 +16,7 @@ impl<'a> ApiKeyAuthenticator<'a> {
 
     pub(super) async fn authenticate(self) -> Result<Option<User>> {
         let digest = self.digest_token()?;
-        let repository = self.app_state.repositories.api_key();
+        let repository = self.app_state.repository.api_key();
         match repository.find_by_digest(&digest).await? {
             Some(api_key) => Ok(Some(User::new(api_key.user_id))),
             _ => Ok(None),

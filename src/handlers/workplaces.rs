@@ -10,7 +10,7 @@ use crate::{
     AppState,
     errors::PerRequestError,
     models::User,
-    repositories::{RepositoryFactory, WorkplaceRepository},
+    repositories::{Repository, WorkplaceRepository},
 };
 
 pub(super) fn routes(config: &mut ServiceConfig) {
@@ -23,7 +23,7 @@ async fn index(
     app_state: Data<AppState>,
     current_user: ReqData<User>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let repository = app_state.repositories.workplace();
+    let repository = app_state.repository.workplace();
     let workplaces = repository.list(&current_user).await?;
 
     let response_json = json!({
@@ -43,7 +43,7 @@ async fn create(
     current_user: ReqData<User>,
     form: Form<CreatingWorkplaceForm>,
 ) -> Result<HttpResponse, PerRequestError> {
-    let repository = app_state.repositories.workplace();
+    let repository = app_state.repository.workplace();
     let workpalce = repository.create(&current_user, &form.name).await?;
 
     let response_json = json!({

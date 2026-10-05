@@ -5,7 +5,7 @@ use crate::{
     AppState,
     errors::DatabaseError,
     models::{ApiKeyId, TokenDigester, TokenGenerator, User},
-    repositories::{ApiKeyRepository, RepositoryFactory},
+    repositories::{ApiKeyRepository, Repository},
 };
 
 pub(super) struct ApiKeyRegistration<'a> {
@@ -34,7 +34,7 @@ impl<'a> ApiKeyRegistration<'a> {
         let token = self.generate_token();
         let digest = self.digest_token(&token);
 
-        let repository = self.app_state.repositories.api_key();
+        let repository = self.app_state.repository.api_key();
         let api_key = repository.create(self.user, self.name, &digest).await?;
 
         let details = RegistationDetails {
