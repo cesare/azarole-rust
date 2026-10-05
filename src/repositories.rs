@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use sqlx::{Pool, Sqlite};
+use sqlx::{Pool, Sqlite, Transaction};
 
 use crate::{
     errors::DatabaseError,
@@ -8,8 +8,10 @@ use crate::{
         WorkplaceId, attendance_record::Event,
     },
     repositories::{
-        api_key::RdbApiKeyRepository, attendance_record::RdbAttendanceRecordRepository,
-        user::RdbUserRepository, workplace::RdbWorkplaceRepository,
+        api_key::RdbApiKeyRepository,
+        attendance_record::RdbAttendanceRecordRepository,
+        user::{RdbUserRepository, TxUserRepository},
+        workplace::RdbWorkplaceRepository,
     },
 };
 
@@ -59,16 +61,20 @@ pub trait WorkplaceRepository {
     async fn find(&self, user: &User, id: WorkplaceId) -> Result<Workplace, DatabaseError>;
 }
 
+#[async_trait]
 pub trait Repository<'r> {
     type ApiKeyRepository: ApiKeyRepository;
     type AttendanceRecordRepository: AttendanceRecordRepository;
     type UserRepository: UserRepository;
     type WorkplaceRepository: WorkplaceRepository;
+    type TransactionalRepository: TransactionalRepository<'r>;
 
     fn api_key(&'r self) -> Self::ApiKeyRepository;
     fn attendance_record(&'r self) -> Self::AttendanceRecordRepository;
     fn user(&'r self) -> Self::UserRepository;
     fn workplace(&'r self) -> Self::WorkplaceRepository;
+
+    async fn begin(&'r self) -> Result<Self::TransactionalRepository, DatabaseError>;
 }
 
 #[derive(Clone)]
@@ -82,11 +88,13 @@ impl RdbRepository {
     }
 }
 
+#[async_trait]
 impl<'r> Repository<'r> for RdbRepository {
     type ApiKeyRepository = RdbApiKeyRepository<'r>;
     type AttendanceRecordRepository = RdbAttendanceRecordRepository<'r>;
     type UserRepository = RdbUserRepository<'r>;
     type WorkplaceRepository = RdbWorkplaceRepository<'r>;
+    type TransactionalRepository = TxRepository<'r>;
 
     fn api_key(&'r self) -> Self::ApiKeyRepository {
         RdbApiKeyRepository::new(&self.pool)
@@ -102,5 +110,55 @@ impl<'r> Repository<'r> for RdbRepository {
 
     fn workplace(&'r self) -> Self::WorkplaceRepository {
         RdbWorkplaceRepository::new(&self.pool)
+    }
+
+    async fn begin(&'r self) -> Result<Self::TransactionalRepository, DatabaseError> {
+        TxRepository::create(&self.pool).await
+    }
+}
+
+#[async_trait]
+pub trait TransactionalUserRepository {
+    async fn find_optional(&mut self, id: UserId) -> Result<Option<User>, DatabaseError>;
+}
+
+#[async_trait]
+pub trait TransactionalRepository<'r> {
+    type UserRepository: TransactionalUserRepository;
+
+    fn user(&'r mut self) -> Self::UserRepository;
+
+    async fn rollback(self) -> Result<(), DatabaseError>;
+    async fn commit(self) -> Result<(), DatabaseError>;
+}
+
+pub struct TxRepository<'r> {
+    tx: Transaction<'r, Sqlite>,
+}
+
+impl<'r> TxRepository<'r> {
+    async fn create(pool: &Pool<Sqlite>) -> Result<Self, DatabaseError> {
+        let tx = pool.begin().await?;
+        let repository = TxRepository { tx };
+        Ok(repository)
+    }
+}
+
+#[async_trait]
+impl<'r> TransactionalRepository<'r> for TxRepository<'r> {
+    type UserRepository = TxUserRepository<'r>;
+
+    fn user(&'r mut self) -> Self::UserRepository {
+        TxUserRepository::new(&mut self.tx)
+    }
+
+    async fn rollback(self) -> Result<(), DatabaseError> {
+        let _ = self.tx.rollback().await?;
+        Ok(())
+    }
+
+    async fn commit(self) -> Result<(), DatabaseError> {
+        let _ = self.tx.commit().await?;
+        Ok(())
     }
 }

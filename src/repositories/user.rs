@@ -1,9 +1,10 @@
 use async_trait::async_trait;
-use sqlx::{Executor, Pool, Sqlite};
+use sqlx::{Executor, Pool, Sqlite, Transaction};
 
 use crate::{
     errors::DatabaseError,
     models::{User, UserId},
+    repositories::TransactionalUserRepository,
 };
 
 use super::UserRepository;
@@ -22,6 +23,23 @@ impl<'r> RdbUserRepository<'r> {
 impl<'r> UserRepository for RdbUserRepository<'r> {
     async fn find_optional(&self, id: UserId) -> Result<Option<User>, DatabaseError> {
         find_optional(self.pool, id).await
+    }
+}
+
+pub struct TxUserRepository<'r> {
+    tx: &'r mut Transaction<'r, Sqlite>,
+}
+
+impl<'r> TxUserRepository<'r> {
+    pub(super) fn new(tx: &'r mut Transaction<'r, Sqlite>) -> Self {
+        TxUserRepository { tx }
+    }
+}
+
+#[async_trait]
+impl<'r> TransactionalUserRepository for TxUserRepository<'r> {
+    async fn find_optional(&mut self, id: UserId) -> Result<Option<User>, DatabaseError> {
+        find_optional(&mut **self.tx, id).await
     }
 }
 
