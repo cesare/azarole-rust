@@ -1,5 +1,6 @@
 use async_trait::async_trait;
-use sqlx::{Pool, Sqlite};
+use chrono::Utc;
+use sqlx::{Pool, Sqlite, Transaction};
 
 use crate::{
     errors::DatabaseError,
@@ -59,16 +60,20 @@ pub trait WorkplaceRepository {
     async fn find(&self, user: &User, id: WorkplaceId) -> Result<Workplace, DatabaseError>;
 }
 
+#[async_trait]
 pub trait Repository<'r> {
     type ApiKeyRepository: ApiKeyRepository;
     type AttendanceRecordRepository: AttendanceRecordRepository;
     type UserRepository: UserRepository;
     type WorkplaceRepository: WorkplaceRepository;
+    type TransactionalRepository: TransactionalRepository;
 
     fn api_key(&'r self) -> Self::ApiKeyRepository;
     fn attendance_record(&'r self) -> Self::AttendanceRecordRepository;
     fn user(&'r self) -> Self::UserRepository;
     fn workplace(&'r self) -> Self::WorkplaceRepository;
+
+    async fn begin(&self) -> Result<Self::TransactionalRepository, DatabaseError>;
 }
 
 #[derive(Clone)]
@@ -82,11 +87,13 @@ impl RdbRepository {
     }
 }
 
+#[async_trait]
 impl<'r> Repository<'r> for RdbRepository {
     type ApiKeyRepository = RdbApiKeyRepository<'r>;
     type AttendanceRecordRepository = RdbAttendanceRecordRepository<'r>;
     type UserRepository = RdbUserRepository<'r>;
     type WorkplaceRepository = RdbWorkplaceRepository<'r>;
+    type TransactionalRepository = TxRepository<'r>;
 
     fn api_key(&'r self) -> Self::ApiKeyRepository {
         RdbApiKeyRepository::new(&self.pool)
@@ -102,5 +109,87 @@ impl<'r> Repository<'r> for RdbRepository {
 
     fn workplace(&'r self) -> Self::WorkplaceRepository {
         RdbWorkplaceRepository::new(&self.pool)
+    }
+
+    async fn begin(&self) -> Result<Self::TransactionalRepository, DatabaseError> {
+        TxRepository::create(&self.pool).await
+    }
+}
+
+#[async_trait]
+pub trait TransactionalRepository {
+    async fn find_optional_user_with_google_uid(
+        &mut self,
+        uid: &str,
+    ) -> Result<Option<User>, DatabaseError>;
+    async fn create_user(&mut self) -> Result<User, DatabaseError>;
+    async fn create_google_uid(&mut self, user: &User, uid: &str) -> Result<(), DatabaseError>;
+
+    async fn rollback(self) -> Result<(), DatabaseError>;
+    async fn commit(self) -> Result<(), DatabaseError>;
+}
+
+pub struct TxRepository<'r> {
+    tx: Transaction<'r, Sqlite>,
+}
+
+impl<'r> TxRepository<'r> {
+    async fn create(pool: &Pool<Sqlite>) -> Result<Self, DatabaseError> {
+        let tx = pool.begin().await?;
+        let repository = TxRepository { tx };
+        Ok(repository)
+    }
+}
+
+#[async_trait]
+impl<'r> TransactionalRepository for TxRepository<'r> {
+    async fn find_optional_user_with_google_uid(
+        &mut self,
+        uid: &str,
+    ) -> Result<Option<User>, DatabaseError> {
+        let statement = "select user_id as id from google_authenticated_users where uid = $1";
+        let user: Option<User> = sqlx::query_as(statement)
+            .bind(uid)
+            .fetch_optional(&mut *self.tx)
+            .await
+            .inspect_err(|e| log::error!("Failed to find user: {:?}", e))?;
+        Ok(user)
+    }
+
+    async fn create_user(&mut self) -> Result<User, DatabaseError> {
+        let now = Utc::now();
+
+        let statement = "insert into users (created_at) values ($1) returning id";
+        let user: User = sqlx::query_as(statement)
+            .bind(now)
+            .fetch_one(&mut *self.tx)
+            .await
+            .inspect_err(|e| log::error!("Failed to create user: {:?}", e))?;
+        Ok(user)
+    }
+
+    async fn create_google_uid(&mut self, user: &User, uid: &str) -> Result<(), DatabaseError> {
+        let now = Utc::now();
+
+        let statement =
+            "insert into google_authenticated_users (user_id, uid, created_at) values ($1, $2, $3)";
+        sqlx::query(statement)
+            .bind(user.id)
+            .bind(uid)
+            .bind(now)
+            .execute(&mut *self.tx)
+            .await
+            .inspect_err(|e| log::error!("Failed to insert google_authenticated_users: {:?}", e))?;
+        Ok(())
+    }
+
+    async fn rollback(self) -> Result<(), DatabaseError> {
+        let _ = self.tx.rollback().await?;
+        Ok(())
+    }
+
+    async fn commit(self) -> Result<(), DatabaseError> {
+        let _ = self.tx.commit().await?;
+        Ok(())
     }
 }
